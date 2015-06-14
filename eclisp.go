@@ -1,20 +1,25 @@
 package main
 
 import (
-	"bufio"
+	// "bufio"
 	"fmt"
-	"os"
+	// "os"
+	"github.com/tiborvass/uniline"
 );
 
-func Readline() []byte {
-	fmt.Printf("eclisp> ")
-	bio := bufio.NewReader(os.Stdin)
-	line, _, _ := bio.ReadLine()
-	// TODO
-	// handle error
-	return line
-}
 
 func main() {
-	Readline()
+	prompt := "eclisp> "
+	scanner := uniline.DefaultScanner()
+	for scanner.Scan(prompt) {
+		line := scanner.Text()
+		if len(line) > 0 {
+			scanner.AddToHistory(line)
+			fmt.Println(line)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
 }
