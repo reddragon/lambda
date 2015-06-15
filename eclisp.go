@@ -3,11 +3,11 @@ package main
 import (
 	// "bufio"
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 	// "os"
 	"github.com/tiborvass/uniline"
-);
+)
 
 func tokenize(line string) []string {
 	tokens := strings.Split(strings.Replace(strings.Replace(line, "(", " ( ", -1), ")", " ) ", -1), " ")
@@ -22,14 +22,14 @@ func tokenize(line string) []string {
 
 // TODO Use only err as error string
 type Atom struct {
-	err bool
+	err    bool
 	errMsg string
-	val int
+	val    int
 }
 
 const (
 	// Delimiters
-	OpenBracket string = "("
+	OpenBracket   string = "("
 	ClosedBracket string = ")"
 
 	// Operators
@@ -57,53 +57,53 @@ func checkArgLen(operatorName string, operands []Atom, expectedArgs int) Atom {
 }
 
 func getHandler(operator string) (int, func([]Atom) Atom) {
-	if (operator == Add) {
+	if operator == Add {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Add, operands, 2)
 			if argCheckErr.err {
 				return argCheckErr
 			}
-			// TODO 
+			// TODO
 			// Do type checks
 
 			retVal.val = operands[0].val + operands[1].val
 			return retVal
 		}
-	} else if (operator == Sub) {
+	} else if operator == Sub {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Sub, operands, 2)
 			if argCheckErr.err {
 				return argCheckErr
 			}
-			// TODO 
+			// TODO
 			// Do type checks
 
 			retVal.val = operands[0].val - operands[1].val
 			return retVal
 		}
-	} else if (operator == Mul) {
+	} else if operator == Mul {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Mul, operands, 2)
 			if argCheckErr.err {
 				return argCheckErr
 			}
-			// TODO 
+			// TODO
 			// Do type checks
 
 			retVal.val = operands[0].val * operands[1].val
 			return retVal
 		}
-	} else if (operator == Div) {
+	} else if operator == Div {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Div, operands, 2)
 			if argCheckErr.err {
 				return argCheckErr
 			}
-			// TODO 
+			// TODO
 			// Do type checks
 
 			retVal.val = operands[0].val / operands[1].val
@@ -124,14 +124,14 @@ func evalArgs(tokens []string) (Atom, []string) {
 	var retVal Atom
 	retVal.err = false
 	retVal.errMsg = ""
-	
+
 	// Expecting a value, but if a ')' occurs, its an error
 	if tokens[0] == ClosedBracket {
 		retVal.errMsg = "Unexpected ')'"
 		retVal.err = true
 		return retVal, tokens
 	}
-	
+
 	// This could be a nested expression
 	if tokens[0] == OpenBracket {
 		return eval(tokens)
@@ -160,11 +160,11 @@ func eval(tokens []string) (Atom, []string) {
 	if token != OpenBracket {
 		// TODO
 		// Raise an exception
-		retVal.errMsg = "Expected a '('";
+		retVal.errMsg = "Expected a '('"
 		retVal.err = true
 		return retVal, tokens
 	}
-	
+
 	token, tokens = pop(tokens)
 	argCount, handler := getHandler(token)
 	if handler == nil {
@@ -172,8 +172,8 @@ func eval(tokens []string) (Atom, []string) {
 		retVal.err = true
 		return retVal, tokens
 	}
-	
-	// Read two args. 
+
+	// Read two args.
 	// TODO change this to read as many args as the operator wants
 
 	// TODO
@@ -189,22 +189,21 @@ func eval(tokens []string) (Atom, []string) {
 		operands = append(operands, operand)
 	}
 
-	
 	token, tokens = pop(tokens)
 	if token != ClosedBracket {
-		retVal.errMsg = "Expected a ')'";
+		retVal.errMsg = "Expected a ')'"
 		retVal.err = true
 		return retVal, tokens
 	}
-	
+
 	return handler(operands), tokens
 }
 
 func process(line string) {
-	tokens := tokenize(line);
+	tokens := tokenize(line)
 	if len(tokens) == 0 {
-		fmt.Println("Nothing to evaluate");
-		return;
+		fmt.Println("Nothing to evaluate")
+		return
 	}
 	// fmt.Printf("%q\n", tokens)
 	var retVal Atom
