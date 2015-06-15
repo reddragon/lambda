@@ -45,11 +45,33 @@ func add(operand1, operand2 Atom) Atom {
 	return retVal
 }
 
-func isValidOperator(operator string) bool {
-	if (operator == Add) {
-		return true
+func checkArgLen(operatorName string, operands []Atom, expectedArgs int) Atom {
+	var retVal Atom
+	if len(operands) != expectedArgs {
+		var retVal Atom
+		retVal.err = true
+		retVal.errMsg = fmt.Sprintf("For operator %s, expected %d args, but got %d.", operatorName, expectedArgs, len(operands))
+		return retVal
 	}
-	return false
+	return retVal
+}
+
+func getHandler(operator string) (int, func([]Atom) Atom) {
+	if (operator == Add) {
+		return 2, func(operands []Atom) Atom {
+			var retVal Atom
+			argCheckErr := checkArgLen(Add, operands, 2)
+			if argCheckErr.err {
+				return argCheckErr
+			}
+			// TODO 
+			// Do type checks
+
+			retVal.val = operands[0].val + operands[1].val
+			return retVal
+		}
+	}
+	return 0, nil
 }
 
 func pop(tokens []string) (string, []string) {
@@ -106,8 +128,8 @@ func eval(tokens []string) (Atom, []string) {
 	}
 	
 	token, tokens = pop(tokens)
-	validOperator := isValidOperator(token)
-	if !validOperator {
+	argCount, handler := getHandler(token)
+	if handler == nil {
 		retVal.errMsg = "Invalid operator, " + token
 		retVal.err = true
 		return retVal, tokens
@@ -119,19 +141,16 @@ func eval(tokens []string) (Atom, []string) {
 	// TODO
 	// Reading just two ints/floats here
 	// Change to read two nested expressions here too
-	
-	var operand1, operand2 Atom
-	operand1, tokens = evalArgs(tokens)
-	if operand1.err {
-		return operand1, tokens
+	operands := make([]Atom, 0)
+	for i := 0; i < argCount; i++ {
+		var operand Atom
+		operand, tokens = evalArgs(tokens)
+		if operand.err {
+			return operand, tokens
+		}
+		operands = append(operands, operand)
 	}
 
-	operand2, tokens = evalArgs(tokens)
-	if operand2.err {
-		return operand2, tokens
-	}
-
-	fmt.Printf("Values of operands: %d, %d\n", operand1.val, operand2.val);
 	
 	token, tokens = pop(tokens)
 	if token != ClosedBracket {
@@ -140,8 +159,7 @@ func eval(tokens []string) (Atom, []string) {
 		return retVal, tokens
 	}
 	
-	retVal.val = add(operand1, operand2).val
-	return retVal, tokens
+	return handler(operands), tokens
 }
 
 func process(line string) {
