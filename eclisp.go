@@ -39,6 +39,12 @@ const (
 	Div string = "/"
 )
 
+func add(operand1, operand2 Atom) Atom {
+	var retVal Atom
+	retVal.val = operand1.val + operand2.val
+	return retVal
+}
+
 func isValidOperator(operator string) bool {
 	if (operator == Add) {
 		return true
@@ -133,7 +139,8 @@ func eval(tokens []string) (Atom, []string) {
 		retVal.err = true
 		return retVal, tokens
 	}
-
+	
+	retVal.val = add(operand1, operand2).val
 	return retVal, tokens
 }
 
@@ -155,6 +162,7 @@ func process(line string) {
 		fmt.Printf("Error: %s\n", retVal.errMsg)
 	} else {
 		fmt.Println("All worked fine!")
+		fmt.Printf("Result: %d\n", retVal.val)
 	}
 	fmt.Printf("\n")
 }
