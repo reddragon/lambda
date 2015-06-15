@@ -70,6 +70,45 @@ func getHandler(operator string) (int, func([]Atom) Atom) {
 			retVal.val = operands[0].val + operands[1].val
 			return retVal
 		}
+	} else if (operator == Sub) {
+		return 2, func(operands []Atom) Atom {
+			var retVal Atom
+			argCheckErr := checkArgLen(Sub, operands, 2)
+			if argCheckErr.err {
+				return argCheckErr
+			}
+			// TODO 
+			// Do type checks
+
+			retVal.val = operands[0].val - operands[1].val
+			return retVal
+		}
+	} else if (operator == Mul) {
+		return 2, func(operands []Atom) Atom {
+			var retVal Atom
+			argCheckErr := checkArgLen(Mul, operands, 2)
+			if argCheckErr.err {
+				return argCheckErr
+			}
+			// TODO 
+			// Do type checks
+
+			retVal.val = operands[0].val * operands[1].val
+			return retVal
+		}
+	} else if (operator == Div) {
+		return 2, func(operands []Atom) Atom {
+			var retVal Atom
+			argCheckErr := checkArgLen(Div, operands, 2)
+			if argCheckErr.err {
+				return argCheckErr
+			}
+			// TODO 
+			// Do type checks
+
+			retVal.val = operands[0].val / operands[1].val
+			return retVal
+		}
 	}
 	return 0, nil
 }
@@ -108,7 +147,6 @@ func evalArgs(tokens []string) (Atom, []string) {
 		return retVal, tokens
 	}
 	retVal.val = val
-	fmt.Printf("Tokens after: %q\n", tokens)
 	return retVal, tokens
 }
 
@@ -168,7 +206,7 @@ func process(line string) {
 		fmt.Println("Nothing to evaluate");
 		return;
 	}
-	fmt.Printf("%q\n", tokens)
+	// fmt.Printf("%q\n", tokens)
 	var retVal Atom
 	retVal, tokens = eval(tokens)
 
@@ -179,8 +217,8 @@ func process(line string) {
 	if retVal.err {
 		fmt.Printf("Error: %s\n", retVal.errMsg)
 	} else {
-		fmt.Println("All worked fine!")
-		fmt.Printf("Result: %d\n", retVal.val)
+		// fmt.Println("All worked fine!")
+		fmt.Printf("%d\n", retVal.val)
 	}
 	fmt.Printf("\n")
 }
