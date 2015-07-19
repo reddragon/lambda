@@ -2,6 +2,7 @@ package lang
 
 import (
 	// "bufio"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -18,11 +19,9 @@ func Tokenize(line string) []string {
 	return noWSTokens
 }
 
-// TODO Use only err as error string
 type Atom struct {
-	Err    bool
-	ErrMsg string
-	Val    int
+	Err   error
+	Value int
 }
 
 const (
@@ -37,18 +36,12 @@ const (
 	Div string = "/"
 )
 
-func add(operand1, operand2 Atom) Atom {
-	var retVal Atom
-	retVal.Val = operand1.Val + operand2.Val
-	return retVal
-}
-
 func checkArgLen(operatorName string, operands []Atom, expectedArgs int) Atom {
 	var retVal Atom
 	if len(operands) != expectedArgs {
 		var retVal Atom
-		retVal.Err = true
-		retVal.ErrMsg = fmt.Sprintf("For operator %s, expected %d args, but got %d.", operatorName, expectedArgs, len(operands))
+
+		retVal.Err = errors.New(fmt.Sprintf("For operator %s, expected %d args, but got %d.", operatorName, expectedArgs, len(operands)))
 		return retVal
 	}
 	return retVal
@@ -59,52 +52,52 @@ func getHandler(operator string) (int, func([]Atom) Atom) {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Add, operands, 2)
-			if argCheckErr.Err {
+			if argCheckErr.Err != nil {
 				return argCheckErr
 			}
 			// TODO
 			// Do type checks
 
-			retVal.Val = operands[0].Val + operands[1].Val
+			retVal.Value = operands[0].Value + operands[1].Value
 			return retVal
 		}
 	} else if operator == Sub {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Sub, operands, 2)
-			if argCheckErr.Err {
+			if argCheckErr.Err != nil {
 				return argCheckErr
 			}
 			// TODO
 			// Do type checks
 
-			retVal.Val = operands[0].Val - operands[1].Val
+			retVal.Value = operands[0].Value - operands[1].Value
 			return retVal
 		}
 	} else if operator == Mul {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Mul, operands, 2)
-			if argCheckErr.Err {
+			if argCheckErr.Err != nil {
 				return argCheckErr
 			}
 			// TODO
 			// Do type checks
 
-			retVal.Val = operands[0].Val * operands[1].Val
+			retVal.Value = operands[0].Value * operands[1].Value
 			return retVal
 		}
 	} else if operator == Div {
 		return 2, func(operands []Atom) Atom {
 			var retVal Atom
 			argCheckErr := checkArgLen(Div, operands, 2)
-			if argCheckErr.Err {
+			if argCheckErr.Err != nil {
 				return argCheckErr
 			}
 			// TODO
 			// Do type checks
 
-			retVal.Val = operands[0].Val / operands[1].Val
+			retVal.Value = operands[0].Value / operands[1].Value
 			return retVal
 		}
 	}
@@ -118,81 +111,52 @@ func pop(tokens []string) (string, []string) {
 	return tokens[0], tokens[1:]
 }
 
-func evalArgs(tokens []string) (Atom, []string) {
+func EvalAST(node *ASTNode) Atom {
 	var retVal Atom
-	retVal.Err = false
-	retVal.ErrMsg = ""
+	retVal.Err = nil
+	retVal.Value = 0
 
-	// Expecting a value, but if a ')' occurs, its an Error
-	if tokens[0] == ClosedBracket {
-		retVal.ErrMsg = "Unexpected ')'"
-		retVal.Err = true
-		return retVal, tokens
-	}
-
-	// This could be a nested expression
-	if tokens[0] == OpenBracket {
-		return Eval(tokens)
-	}
-
-	// This is an atomic value
-	token := ""
-	token, tokens = pop(tokens)
-	val, err := strconv.Atoi(token)
-	if err != nil {
-		retVal.ErrMsg = "Problem while converting " + token + ": " + err.Error()
-		retVal.Err = true
-		return retVal, tokens
-	}
-	retVal.Val = val
-	return retVal, tokens
-}
-
-func Eval(tokens []string) (Atom, []string) {
-	var retVal Atom
-	retVal.Err = false
-	retVal.ErrMsg = ""
-
-	token := ""
-	token, tokens = pop(tokens)
-	if token != OpenBracket {
-		// TODO
-		// Raise an exception
-		retVal.ErrMsg = "Expected a '('"
-		retVal.Err = true
-		return retVal, tokens
-	}
-
-	token, tokens = pop(tokens)
-	argCount, handler := getHandler(token)
-	if handler == nil {
-		retVal.ErrMsg = "Invalid operator, " + token
-		retVal.Err = true
-		return retVal, tokens
-	}
-
-	// Read two args.
-	// TODO change this to read as many args as the operator wants
-
-	// TODO
-	// Reading just two ints/floats here
-	// Change to read two nested expressions here too
-	operands := make([]Atom, 0)
-	for i := 0; i < argCount; i++ {
-		var operand Atom
-		operand, tokens = evalArgs(tokens)
-		if operand.Err {
-			return operand, tokens
+	if node.isValue {
+		// TODO Check here if the value is a proper value
+		value, err := strconv.Atoi(node.value)
+		if err != nil {
+			retVal.Err = errStr("value", node.value)
+		} else {
+			retVal.Value = value
 		}
-		operands = append(operands, operand)
+		return retVal
+	}
+	if len(node.children) == 1 {
+		return EvalAST(node.children[0])
 	}
 
-	token, tokens = pop(tokens)
-	if token != ClosedBracket {
-		retVal.ErrMsg = "Expected a ')'"
-		retVal.Err = true
-		return retVal, tokens
+	// Assuming that the first child is an operand
+	operator := node.children[0].value
+	// fmt.Printf("Will work on the operator %s\n", operator)
+	argCount, handler := getHandler(operator)
+	// fmt.Printf("ArgCount: %d\n", argCount)
+
+	if len(node.children)-1 != argCount {
+		retVal.Err = errors.New(
+			fmt.Sprintf("Received %d arguments for operator %s, expected: %d",
+				len(node.children)-1, operator, argCount))
+		return retVal
 	}
 
-	return handler(operands), tokens
+	operands := make([]Atom, 0)
+	for i := 1; i < len(node.children); i++ {
+		v := EvalAST(node.children[i])
+		if v.Err != nil {
+			return v
+		}
+		// fmt.Printf("Pushing value: %d\n", v.Value)
+		operands = append(operands, v)
+	}
+	// fmt.Printf("Len of operands: %d\n", len(operands))
+	v := handler(operands)
+	if v.Err != nil {
+		return v
+	}
+	retVal.Value = v.Value
+	return retVal
 }

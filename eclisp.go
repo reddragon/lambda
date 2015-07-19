@@ -3,10 +3,10 @@ package main
 import (
 	// "bufio"
 	"fmt"
-	"strconv"
+	// "strconv"
 	// "os"
-	"github.com/tiborvass/uniline"
 	l "github.com/reddragon/eclisp/lang"
+	"github.com/tiborvass/uniline"
 )
 
 func process(line string) {
@@ -15,21 +15,20 @@ func process(line string) {
 		fmt.Println("Nothing to evaluate")
 		return
 	}
-	// fmt.Printf("%q\n", tokens)
-	var retVal l.Atom
-	retVal, tokens = l.Eval(tokens)
-
-	if len(tokens) != 0 {
-		retVal.ErrMsg = strconv.Itoa(len(tokens)) + " extra token(s) in the string."
-		retVal.Err = true
-	}
-	if retVal.Err {
-		fmt.Printf("Error: %s\n", retVal.ErrMsg)
+	node, tokens, err := l.GetAST(tokens)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
 	} else {
-		// fmt.Println("All worked fine!")
-		fmt.Printf("%d\n", retVal.Val)
+		// fmt.Println("Worked fine!")
+		// fmt.Printf("Parsed AST: %s\n", l.StringifyAST(node))
+		var retVal l.Atom
+		retVal = l.EvalAST(node)
+		if retVal.Err != nil {
+			fmt.Printf("Error: %s\n", retVal.Err)
+		} else {
+			fmt.Printf("%d\n", retVal.Value)
+		}
 	}
-	fmt.Printf("\n")
 }
 
 func main() {
