@@ -9,7 +9,7 @@ import (
 	"github.com/tiborvass/uniline"
 )
 
-func process(line string) {
+func process(env *l.LangEnv, line string) {
 	tokens := l.Tokenize(line)
 	if len(tokens) == 0 {
 		fmt.Println("Nothing to evaluate")
@@ -22,23 +22,27 @@ func process(line string) {
 		// fmt.Println("Worked fine!")
 		// fmt.Printf("Parsed AST: %s\n", l.StringifyAST(node))
 		var retVal l.Atom
-		retVal = l.EvalAST(node)
+		retVal = l.EvalAST(env, node)
 		if retVal.Err != nil {
 			fmt.Printf("Error: %s\n", retVal.Err)
 		} else {
-			fmt.Printf("%d\n", retVal.Value)
+			fmt.Printf("%d\n", retVal.Val)
 		}
 	}
 }
 
 func main() {
+	// Setup the language environment
+	env := new(l.LangEnv)
+	env.Init()
+
 	prompt := "eclisp> "
 	scanner := uniline.DefaultScanner()
 	for scanner.Scan(prompt) {
 		line := scanner.Text()
 		if len(line) > 0 {
 			scanner.AddToHistory(line)
-			process(line)
+			process(env, line)
 		}
 	}
 

@@ -14,8 +14,8 @@ type ASTNode struct {
 }
 
 const (
-	oB string = "("
-	cB string = ")"
+	OpenBracket   string = "("
+	ClosedBracket string = ")"
 )
 
 func errStr(expected, found string) error {
@@ -34,7 +34,7 @@ func GetAST(tokens []string) (*ASTNode, []string, error) {
 		// TODO Check that this token is a value.
 		//      A proxy for now is checking if this is not a ( or )
 		token, tokens = pop(tokens)
-		if token == oB || token == cB {
+		if token == OpenBracket || token == ClosedBracket {
 			return nil, tokens, errStr("value", token)
 		}
 
@@ -45,8 +45,8 @@ func GetAST(tokens []string) (*ASTNode, []string, error) {
 		return node, tokens, nil
 	} else {
 		token, tokens = pop(tokens)
-		if token != oB {
-			return nil, tokens, errStr(oB, token)
+		if token != OpenBracket {
+			return nil, tokens, errStr(OpenBracket, token)
 		}
 
 		node := new(ASTNode)
@@ -55,11 +55,11 @@ func GetAST(tokens []string) (*ASTNode, []string, error) {
 		node.children = make([]*ASTNode, 0)
 
 		tokensLen = len(tokens)
-		for len(tokens) != 0 && tokens[0] != cB {
+		for len(tokens) != 0 && tokens[0] != ClosedBracket {
 			var childNode *ASTNode = nil
 			var err error = nil
 			// If this is not an open brace, this is a single value
-			if tokens[0] != oB {
+			if tokens[0] != OpenBracket {
 				token, tokens = pop(tokens)
 				// fmt.Printf("Processing val: %s\n", token)
 				childNode, _, err = GetAST([]string{token})
@@ -74,12 +74,12 @@ func GetAST(tokens []string) (*ASTNode, []string, error) {
 		}
 		// fmt.Printf("Done with inner operands, tokens: %q\n", tokens)
 		if len(tokens) == 0 {
-			return nil, tokens, errStr(cB, "nil")
+			return nil, tokens, errStr(ClosedBracket, "nil")
 		}
 
 		token, tokens = pop(tokens)
-		if token != cB {
-			return nil, tokens, errStr(token, cB)
+		if token != ClosedBracket {
+			return nil, tokens, errStr(token, ClosedBracket)
 		}
 		return node, tokens, nil
 	}

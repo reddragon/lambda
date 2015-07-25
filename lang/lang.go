@@ -19,89 +19,42 @@ func Tokenize(line string) []string {
 	return noWSTokens
 }
 
+// An Atom is either a value, or an error
 type Atom struct {
-	Err   error
-	Value int
+	Err error
+	// TODO Value should be of type Value
+	Val int
 }
 
-const (
-	// Delimiters
-	OpenBracket   string = "("
-	ClosedBracket string = ")"
+// Different types of values supported
+type ValueType int
 
-	// Operators
-	Add string = "+"
-	Sub string = "-"
-	Mul string = "*"
-	Div string = "/"
+const (
+	// Value type
+	IntType = iota
+	FloatType
+	StringType
 )
+
+type Value interface {
+	valueType() ValueType
+	to(ValueType) (Value, error)
+	str() string
+	// TODO
+	// Add other methods
+}
 
 func checkArgLen(operatorName string, operands []Atom, expectedArgs int) Atom {
 	var retVal Atom
 	if len(operands) != expectedArgs {
 		var retVal Atom
 
-		retVal.Err = errors.New(fmt.Sprintf("For operator %s, expected %d args, but got %d.", operatorName, expectedArgs, len(operands)))
+		retVal.Err = errors.New(
+			fmt.Sprintf("For operator %s, expected %d args, but got %d.",
+				operatorName, expectedArgs, len(operands)))
 		return retVal
 	}
 	return retVal
-}
-
-func getHandler(operator string) (int, func([]Atom) Atom) {
-	if operator == Add {
-		return 2, func(operands []Atom) Atom {
-			var retVal Atom
-			argCheckErr := checkArgLen(Add, operands, 2)
-			if argCheckErr.Err != nil {
-				return argCheckErr
-			}
-			// TODO
-			// Do type checks
-
-			retVal.Value = operands[0].Value + operands[1].Value
-			return retVal
-		}
-	} else if operator == Sub {
-		return 2, func(operands []Atom) Atom {
-			var retVal Atom
-			argCheckErr := checkArgLen(Sub, operands, 2)
-			if argCheckErr.Err != nil {
-				return argCheckErr
-			}
-			// TODO
-			// Do type checks
-
-			retVal.Value = operands[0].Value - operands[1].Value
-			return retVal
-		}
-	} else if operator == Mul {
-		return 2, func(operands []Atom) Atom {
-			var retVal Atom
-			argCheckErr := checkArgLen(Mul, operands, 2)
-			if argCheckErr.Err != nil {
-				return argCheckErr
-			}
-			// TODO
-			// Do type checks
-
-			retVal.Value = operands[0].Value * operands[1].Value
-			return retVal
-		}
-	} else if operator == Div {
-		return 2, func(operands []Atom) Atom {
-			var retVal Atom
-			argCheckErr := checkArgLen(Div, operands, 2)
-			if argCheckErr.Err != nil {
-				return argCheckErr
-			}
-			// TODO
-			// Do type checks
-
-			retVal.Value = operands[0].Value / operands[1].Value
-			return retVal
-		}
-	}
-	return 0, nil
 }
 
 func pop(tokens []string) (string, []string) {
@@ -111,10 +64,10 @@ func pop(tokens []string) (string, []string) {
 	return tokens[0], tokens[1:]
 }
 
-func EvalAST(node *ASTNode) Atom {
+func EvalAST(env *LangEnv, node *ASTNode) Atom {
 	var retVal Atom
 	retVal.Err = nil
-	retVal.Value = 0
+	retVal.Val = 0
 
 	if node.isValue {
 		// TODO Check here if the value is a proper value
@@ -122,41 +75,46 @@ func EvalAST(node *ASTNode) Atom {
 		if err != nil {
 			retVal.Err = errStr("value", node.value)
 		} else {
-			retVal.Value = value
+			retVal.Val = value
 		}
 		return retVal
 	}
 	if len(node.children) == 1 {
-		return EvalAST(node.children[0])
+		return EvalAST(env, node.children[0])
 	}
 
 	// Assuming that the first child is an operand
-	operator := node.children[0].value
+	symbol := node.children[0].value
 	// fmt.Printf("Will work on the operator %s\n", operator)
-	argCount, handler := getHandler(operator)
+	operator := env.getOperator(symbol)
+	if operator == nil {
+		retVal.Err = errors.New(fmt.Sprintf("Unknown operator '%s'", symbol))
+		return retVal
+	}
+
 	// fmt.Printf("ArgCount: %d\n", argCount)
 
-	if len(node.children)-1 != argCount {
+	if len(node.children)-1 != operator.argCount {
 		retVal.Err = errors.New(
 			fmt.Sprintf("Received %d arguments for operator %s, expected: %d",
-				len(node.children)-1, operator, argCount))
+				len(node.children)-1, symbol, operator.argCount))
 		return retVal
 	}
 
 	operands := make([]Atom, 0)
 	for i := 1; i < len(node.children); i++ {
-		v := EvalAST(node.children[i])
+		v := EvalAST(env, node.children[i])
 		if v.Err != nil {
 			return v
 		}
-		// fmt.Printf("Pushing value: %d\n", v.Value)
+		// fmt.Printf("Pushing value: %d\n", v.Val)
 		operands = append(operands, v)
 	}
 	// fmt.Printf("Len of operands: %d\n", len(operands))
-	v := handler(operands)
+	v := operator.handler(operands)
 	if v.Err != nil {
 		return v
 	}
-	retVal.Value = v.Value
+	retVal.Val = v.Val
 	return retVal
 }
