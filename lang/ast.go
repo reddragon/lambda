@@ -3,6 +3,7 @@ package lang
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // An AstNode either has a value, or has children.
@@ -22,8 +23,32 @@ func errStr(expected, found string) error {
 	return errors.New(fmt.Sprintf("Expected %s, got %s.", expected, found))
 }
 
-// This method gets you the AST of the expression.
-func GetAST(tokens []string) (*ASTNode, []string, error) {
+// This method gets you the AST of a given expression.
+func GetAST(exp string) (*ASTNode, []string, error) {
+	tokens := tokenize(exp)
+	if len(tokens) == 0 {
+		return nil, nil, errors.New("Nothing to evaluate")
+	}
+	return getAST(tokens)
+}
+
+func tokenize(exp string) []string {
+	tokens := strings.Split(
+		strings.Replace(strings.Replace(exp, "(", " ( ", -1), ")", " ) ", -1),
+		" ",
+	)
+	noWSTokens := make([]string, 0)
+	for _, token := range tokens {
+		if token != "" {
+			noWSTokens = append(noWSTokens, token)
+		}
+	}
+	return noWSTokens
+}
+
+// This method does the heavy-lifting of building an AST, once an expression
+// is tokenized.
+func getAST(tokens []string) (*ASTNode, []string, error) {
 	var token = ""
 	tokensLen := len(tokens)
 	// fmt.Printf("Processing tokens: %q, len: %d\n", tokens, tokensLen)
@@ -62,10 +87,10 @@ func GetAST(tokens []string) (*ASTNode, []string, error) {
 			if tokens[0] != OpenBracket {
 				token, tokens = pop(tokens)
 				// fmt.Printf("Processing val: %s\n", token)
-				childNode, _, err = GetAST([]string{token})
+				childNode, _, err = getAST([]string{token})
 			} else {
 				// fmt.Printf("Processing inner AST: %q\n", tokens)
-				childNode, tokens, err = GetAST(tokens)
+				childNode, tokens, err = getAST(tokens)
 			}
 			if err != nil {
 				return nil, tokens, err

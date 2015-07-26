@@ -1,26 +1,16 @@
 package main
 
 import (
-	// "bufio"
 	"fmt"
-	// "strconv"
-	// "os"
 	l "github.com/reddragon/eclisp/lang"
 	"github.com/tiborvass/uniline"
 )
 
 func process(env *l.LangEnv, line string) {
-	tokens := l.Tokenize(line)
-	if len(tokens) == 0 {
-		fmt.Println("Nothing to evaluate")
-		return
-	}
-	node, tokens, err := l.GetAST(tokens)
+	node, _, err := l.GetAST(line)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 	} else {
-		// fmt.Println("Worked fine!")
-		// fmt.Printf("Parsed AST: %s\n", l.StringifyAST(node))
 		var retVal l.Atom
 		retVal = l.EvalAST(env, node)
 		if retVal.Err != nil {

@@ -5,63 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 )
-
-func Tokenize(line string) []string {
-	tokens := strings.Split(strings.Replace(strings.Replace(line, "(", " ( ", -1), ")", " ) ", -1), " ")
-	noWSTokens := make([]string, 0)
-	for _, token := range tokens {
-		if token != "" {
-			noWSTokens = append(noWSTokens, token)
-		}
-	}
-	return noWSTokens
-}
 
 // An Atom is either a value, or an error
 type Atom struct {
 	Err error
 	// TODO Value should be of type Value
 	Val int
-}
-
-// Different types of values supported
-type ValueType int
-
-const (
-	// Value type
-	IntType = iota
-	FloatType
-	StringType
-)
-
-type Value interface {
-	valueType() ValueType
-	to(ValueType) (Value, error)
-	str() string
-	// TODO
-	// Add other methods
-}
-
-func checkArgLen(operatorName string, operands []Atom, expectedArgs int) Atom {
-	var retVal Atom
-	if len(operands) != expectedArgs {
-		var retVal Atom
-
-		retVal.Err = errors.New(
-			fmt.Sprintf("For operator %s, expected %d args, but got %d.",
-				operatorName, expectedArgs, len(operands)))
-		return retVal
-	}
-	return retVal
-}
-
-func pop(tokens []string) (string, []string) {
-	if len(tokens) == 0 {
-		return "", tokens
-	}
-	return tokens[0], tokens[1:]
 }
 
 func EvalAST(env *LangEnv, node *ASTNode) Atom {
