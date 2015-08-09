@@ -21,6 +21,15 @@ func process(env *l.LangEnv, line string) {
 	}
 }
 
+func printType(line string) {
+	inferredType, err := l.GetType(line)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	} else {
+		fmt.Printf("Type: %s", inferredType)
+	}
+}
+
 func main() {
 	// Setup the language environment
 	env := new(l.LangEnv)
