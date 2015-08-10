@@ -1,13 +1,19 @@
 package lang
 
+import (
+  "errors"
+  "fmt"
+  "strconv"
+)
+
 // Different types of values supported
-type ValueType int
+type ValueType string
 
 const (
 	// Value type
-  StringType = iota
-	IntType
-	FloatType
+  StringType = "StringType"
+	IntType = "IntType"
+	FloatType = "FloatType"
 )
 
 type Value interface {
@@ -15,15 +21,17 @@ type Value interface {
 	to(ValueType) (Value, error)
 	str() string
   ofType(string) bool
-	// TODO
+  // newValue(string) *Value
+  // TODO
 	// Add other methods
 }
 
-func GetType(token string) ValueType {
+func GetType(token string) (ValueType, error) {
   // Algorithm
   // 1. Go through all the value types, in order.
   // 2. Pick the highest value type that complies.
   // 3. Return that value type.
+  return StringType, nil
 }
 
 /*
@@ -36,8 +44,12 @@ Types in eclisp:
 2.0
 > 1 / 0
 NaN
-> 
+>
 */
+
+func typeConvError(from, to ValueType) error {
+  return errors.New(fmt.Sprintf("Cannot convert %s to %s", from, to))
+}
 
 type StringValue struct {
   value string
@@ -48,43 +60,60 @@ func (v StringValue) valueType() ValueType {
 }
 
 func (v StringValue) to(targetType ValueType) (Value, error) {
-  // TODO
   switch targetType {
-  case StringType: return value
-  // TODO Implement others
+  case StringType: return v, nil
   }
+  return nil, typeConvError(v.valueType(), targetType)
 }
 
 func (v StringValue) str() string {
-  return v.to(StringType)
+  return v.value
 }
 
-func (v StringType) ofType(targetValue string) bool {
-  return true
+func (v StringValue) ofType(targetValue string) bool {
+  valLen := len(targetValue)
+  if valLen < 2 {
+    return false
+  }
+  // TODO
+  // Stricter checks for quotes inside strings, like ''' should not be valid.
+  f, l := targetValue[0], targetValue[valLen - 1]
+  if (f == '\'' && l == '\'') || (f == '"' && l == '"') {
+    return true
+  }
+  return false
 }
 
 /*
 type FloatValue struct {
   value float64
 }
+*/
 
 type IntValue struct {
-  value int
+  value int64
 }
 
 func (v IntValue) valueType() ValueType {
   return IntType
 }
 
-func (v IntValue) to(vtype ValueType) (Value, error) {
-  switch vtype {
-    case IntType:
-    case FloatType:
-    case StringType:
+func (v IntValue) to(targetType ValueType) (Value, error) {
+  switch targetType {
+    case IntType: return v, nil
   }
-  return nil, nil
-
-  var r FloatValue
-  return r, nil
+  return nil, typeConvError(v.valueType(), targetType)
 }
-*/
+
+func (v IntValue) ofType(targetValue string) bool {
+  _, err := strconv.ParseInt(targetValue, 0, 64)
+  if err != nil {
+    // fmt.Printf("Error processing %s: %s", targetValue, err)
+    return false
+  }
+  return true
+}
+
+func (v IntValue) str() string {
+  return ""
+}

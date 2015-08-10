@@ -86,3 +86,10 @@ func builtinOperators() map[string]*Operator {
 	)
   return opMap
 }
+
+func builtinTypes() ([]Value) {
+	types := make([]Value, 0)
+	types = append(types, new(StringValue))
+	types = append(types, new(IntValue))
+	return types
+}
