@@ -6,9 +6,9 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 
 // This methods returns all the builtin operators to the environment
 func builtinOperators() map[string]*Operator {
-  // builtins := make(*Operator[], 0)
+	// builtins := make(*Operator[], 0)
 	opMap := make(map[string]*Operator)
-  // This method adds the default
+	// This method adds the default
 	addOperator(opMap,
 		&Operator{
 			symbol:   Add,
@@ -28,7 +28,7 @@ func builtinOperators() map[string]*Operator {
 		},
 	)
 
-  addOperator(opMap,
+	addOperator(opMap,
 		&Operator{
 			symbol:   Sub,
 			argCount: 2,
@@ -84,10 +84,10 @@ func builtinOperators() map[string]*Operator {
 			},
 		},
 	)
-  return opMap
+	return opMap
 }
 
-func builtinTypes() ([]Value) {
+func builtinTypes() []Value {
 	types := make([]Value, 0)
 	types = append(types, new(StringValue))
 	types = append(types, new(IntValue))

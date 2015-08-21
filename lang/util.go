@@ -1,8 +1,8 @@
 package lang
 
 import (
-  "errors"
-  "fmt"
+	"errors"
+	"fmt"
 )
 
 func checkArgLen(operatorName string, operands []Atom, expectedArgs int) Atom {
