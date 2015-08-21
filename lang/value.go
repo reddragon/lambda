@@ -84,12 +84,6 @@ func (v StringValue) ofType(targetValue string) bool {
   return false
 }
 
-/*
-type FloatValue struct {
-  value float64
-}
-*/
-
 type IntValue struct {
   value int64
 }
@@ -101,6 +95,7 @@ func (v IntValue) valueType() ValueType {
 func (v IntValue) to(targetType ValueType) (Value, error) {
   switch targetType {
     case IntType: return v, nil
+    case FloatType: return FloatValue{float64(v.value)}, nil
   }
   return nil, typeConvError(v.valueType(), targetType)
 }
@@ -115,5 +110,34 @@ func (v IntValue) ofType(targetValue string) bool {
 }
 
 func (v IntValue) str() string {
-  return ""
+  return strconv.FormatInt(v.value, 10)
+}
+
+
+type FloatValue struct {
+  value float64
+}
+
+func (v FloatValue) valueType() ValueType {
+  return FloatType
+}
+
+func (v FloatValue) to(targetType ValueType) (Value, error) {
+  switch targetType {
+    case FloatType: return v, nil
+  }
+  return nil, typeConvError(v.valueType(), targetType)
+}
+
+func (v FloatValue) ofType(targetValue string) bool {
+  _, err := strconv.ParseFloat(targetValue, 64)
+  if err != nil {
+    // fmt.Printf("Error processing %s: %s", targetValue, err)
+    return false
+  }
+  return true
+}
+
+func (v FloatValue) str() string {
+  return strconv.FormatFloat(v.value, 'g', -1, 64)
 }
