@@ -21,17 +21,24 @@ type Value interface {
 	to(ValueType) (Value, error)
 	str() string
   ofType(string) bool
-  // newValue(string) *Value
+  newValue(string) Value
   // TODO
 	// Add other methods
 }
 
-func GetType(token string) (ValueType, error) {
-  // Algorithm
-  // 1. Go through all the value types, in order.
-  // 2. Pick the highest value type that complies.
-  // 3. Return that value type.
-  return StringType, nil
+// Algorithm
+// 1. Go through all the value types, in order.
+// 2. Pick the highest value type that complies.
+// 3. Return that value type.
+func GetValue(token string) (Value, error) {
+  // TODO Use env types
+  types := builtinTypes()
+  for _, t := range types {
+    if t.ofType(token) {
+      return t.newValue(token), nil
+    }
+  }
+  return nil, errors.New(fmt.Sprintf("Could not get type for token: %s", token))
 }
 
 /*
@@ -84,6 +91,12 @@ func (v StringValue) ofType(targetValue string) bool {
   return false
 }
 
+func (v StringValue) newValue(str string) Value {
+  val := new(StringValue)
+  val.value = str
+  return val
+}
+
 type IntValue struct {
   value int64
 }
@@ -113,6 +126,15 @@ func (v IntValue) str() string {
   return strconv.FormatInt(v.value, 10)
 }
 
+func (v IntValue) newValue(str string) Value {
+  intVal, err := strconv.ParseInt(str, 0, 64)
+  if err != nil {
+    return nil
+  }
+  val := new(IntValue)
+  val.value = intVal
+  return val
+}
 
 type FloatValue struct {
   value float64
@@ -140,4 +162,14 @@ func (v FloatValue) ofType(targetValue string) bool {
 
 func (v FloatValue) str() string {
   return strconv.FormatFloat(v.value, 'g', -1, 64)
+}
+
+func (v FloatValue) newValue(str string) Value {
+  floatVal, err := strconv.ParseFloat(str, 64)
+  if err != nil {
+    return nil
+  }
+  val := new(FloatValue)
+  val.value = floatVal
+  return val
 }

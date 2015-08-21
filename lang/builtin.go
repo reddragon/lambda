@@ -91,5 +91,6 @@ func builtinTypes() ([]Value) {
 	types := make([]Value, 0)
 	types = append(types, new(StringValue))
 	types = append(types, new(IntValue))
+	types = append(types, new(FloatValue))
 	return types
 }

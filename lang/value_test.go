@@ -109,3 +109,20 @@ func TestStringValue(t *testing.T) {
 
   doChecks(sv, strCases, t)
 }
+
+func TestTypeInfer(t *testing.T) {
+  v, e := GetValue("1")
+  if v == nil || v.valueType() != IntType || e != nil {
+    t.Errorf("Could not correctly GetType(1)")
+  }
+
+  v, e = GetValue("1.2")
+  if v == nil || v.valueType() != FloatType || e != nil {
+    t.Errorf("Could not correctly GetType(1)")
+  }
+
+  v, e = GetValue("'xyz'")
+  if v == nil || v.valueType() != StringType || e != nil {
+    t.Errorf("Could not correctly GetType(1)")
+  }
+}
