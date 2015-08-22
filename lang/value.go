@@ -17,9 +17,9 @@ const (
 )
 
 type Value interface {
-	valueType() ValueType
-	to(ValueType) (Value, error)
-	str() string
+	GetValueType() ValueType
+	To(ValueType) (Value, error)
+	Str() string
 	ofType(string) bool
 	newValue(string) Value
 	// TODO
@@ -62,19 +62,19 @@ type StringValue struct {
 	value string
 }
 
-func (v StringValue) valueType() ValueType {
+func (v StringValue) GetValueType() ValueType {
 	return StringType
 }
 
-func (v StringValue) to(targetType ValueType) (Value, error) {
+func (v StringValue) To(targetType ValueType) (Value, error) {
 	switch targetType {
 	case StringType:
 		return v, nil
 	}
-	return nil, typeConvError(v.valueType(), targetType)
+	return nil, typeConvError(v.GetValueType(), targetType)
 }
 
-func (v StringValue) str() string {
+func (v StringValue) Str() string {
 	return v.value
 }
 
@@ -102,18 +102,18 @@ type IntValue struct {
 	value int64
 }
 
-func (v IntValue) valueType() ValueType {
+func (v IntValue) GetValueType() ValueType {
 	return IntType
 }
 
-func (v IntValue) to(targetType ValueType) (Value, error) {
+func (v IntValue) To(targetType ValueType) (Value, error) {
 	switch targetType {
 	case IntType:
 		return v, nil
 	case FloatType:
 		return FloatValue{float64(v.value)}, nil
 	}
-	return nil, typeConvError(v.valueType(), targetType)
+	return nil, typeConvError(v.GetValueType(), targetType)
 }
 
 func (v IntValue) ofType(targetValue string) bool {
@@ -125,7 +125,7 @@ func (v IntValue) ofType(targetValue string) bool {
 	return true
 }
 
-func (v IntValue) str() string {
+func (v IntValue) Str() string {
 	return strconv.FormatInt(v.value, 10)
 }
 
@@ -143,16 +143,16 @@ type FloatValue struct {
 	value float64
 }
 
-func (v FloatValue) valueType() ValueType {
+func (v FloatValue) GetValueType() ValueType {
 	return FloatType
 }
 
-func (v FloatValue) to(targetType ValueType) (Value, error) {
+func (v FloatValue) To(targetType ValueType) (Value, error) {
 	switch targetType {
 	case FloatType:
 		return v, nil
 	}
-	return nil, typeConvError(v.valueType(), targetType)
+	return nil, typeConvError(v.GetValueType(), targetType)
 }
 
 func (v FloatValue) ofType(targetValue string) bool {
@@ -164,7 +164,7 @@ func (v FloatValue) ofType(targetValue string) bool {
 	return true
 }
 
-func (v FloatValue) str() string {
+func (v FloatValue) Str() string {
 	return strconv.FormatFloat(v.value, 'g', -1, 64)
 }
 

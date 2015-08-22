@@ -22,11 +22,11 @@ func process(env *l.LangEnv, line string) {
 }
 
 func printType(line string) {
-	inferredType, err := l.GetType(line)
+	v, err := l.GetValue(line)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 	} else {
-		fmt.Printf("Type: %s", inferredType)
+		fmt.Printf("Type: %s\n", v.GetValueType())
 	}
 }
 
@@ -41,7 +41,8 @@ func main() {
 		line := scanner.Text()
 		if len(line) > 0 {
 			scanner.AddToHistory(line)
-			process(env, line)
+			printType(line)
+			// process(env, line)
 		}
 	}
 
