@@ -4,24 +4,25 @@ import (
 	// "bufio"
 	"errors"
 	"fmt"
-	"strconv"
+	// "strconv"
 )
 
 // An Atom is either a value, or an error
 type Atom struct {
 	Err error
 	// TODO Value should be of type Value
-	Val int
+	// Val int
+	Val Value
 }
 
 func EvalAST(env *LangEnv, node *ASTNode) Atom {
 	var retVal Atom
 	retVal.Err = nil
-	retVal.Val = 0
 
 	if node.isValue {
 		// TODO Check here if the value is a proper value
-		value, err := strconv.Atoi(node.value)
+		// value, err := strconv.Atoi(node.value)
+		value, err := GetValue(node.value)
 		if err != nil {
 			retVal.Err = errStr("value", node.value)
 		} else {

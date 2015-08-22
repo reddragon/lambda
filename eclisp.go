@@ -16,7 +16,11 @@ func process(env *l.LangEnv, line string) {
 		if retVal.Err != nil {
 			fmt.Printf("Error: %s\n", retVal.Err)
 		} else {
-			fmt.Printf("%d\n", retVal.Val)
+			if retVal.Val != nil {
+				fmt.Printf("%s\n", retVal.Val.Str())
+			} else {
+				fmt.Printf("\n")
+			}
 		}
 	}
 }
@@ -41,8 +45,8 @@ func main() {
 		line := scanner.Text()
 		if len(line) > 0 {
 			scanner.AddToHistory(line)
-			printType(line)
-			// process(env, line)
+			// printType(line)
+			process(env, line)
 		}
 	}
 
