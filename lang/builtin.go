@@ -17,11 +17,12 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 //
 // TODO
 // Mix typeCoerce() and checkArgTypes()
-func typeCoerce(operands []Atom, typesCountMap map[ValueType]int, typePrecendenceMap map[ValueType]int) ([]Atom, ValueType, error) {
+func typeCoerce(operands *[]Atom, typesCountMap map[ValueType]int, typePrecendenceMap map[ValueType]int) (ValueType, error) {
 	if len(typesCountMap) == 1 {
-		valType := operands[0].Val.GetValueType()
+		fmt.Printf("Value initially was: %s\n", (*operands)[0].Val.Str())
+		valType := (*operands)[0].Val.GetValueType()
 		fmt.Printf("Only one type (%s) in the typesCountMap, so nothing to do.\n", valType)
-		return operands, valType, nil
+		return valType, nil
 	}
 
 	var finalType ValueType
@@ -37,16 +38,16 @@ func typeCoerce(operands []Atom, typesCountMap map[ValueType]int, typePrecendenc
 		}
 	}
 
-	for _, o := range operands {
+	for _, o := range *operands {
 		if o.Val.GetValueType() != finalType {
 			var err error
 			o.Val, err = o.Val.To(finalType)
 			if err != nil {
-				return nil, "", err
+				return "", err
 			}
 		}
 	}
-	return operands, finalType, nil
+	return finalType, nil
 }
 
 // This methods returns all the builtin operators to the environment
@@ -70,17 +71,44 @@ func builtinOperators() map[string]*Operator {
 					return retVal
 				}
 
-				typePrecedenceMap := map[ValueType]int{IntType: 1, FloatType: 2}
 				// Type Coercion
+				typePrecedenceMap := map[ValueType]int{IntType: 1, FloatType: 2}
 				var finalType ValueType
-				operands, finalType, retVal.Err = typeCoerce(operands, typesCountMap, typePrecedenceMap)
+				finalType, retVal.Err = typeCoerce(&operands, typesCountMap, typePrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
 				}
-
 				fmt.Printf("Did type-coercion, final type was: %s\n", finalType)
 
-				// retVal.Val = operands[0].Val + operands[1].Val
+				switch finalType {
+				case IntType:
+					var finalVal IntValue
+					finalVal.value = 0
+					for _, o := range operands {
+						v, ok := o.Val.(*IntValue)
+						if ok {
+							finalVal.value = finalVal.value + v.value
+						} else {
+							fmt.Errorf("Error while converting %s to IntValue\n", o.Val.Str())
+						}
+					}
+					retVal.Val = finalVal
+					break;
+
+				case FloatType:
+					var finalVal FloatValue
+					finalVal.value = 0
+					for _, o := range operands {
+						v, ok := o.Val.(*FloatValue)
+						if ok {
+							finalVal.value = finalVal.value + v.value
+						} else {
+							fmt.Errorf("Error while converting %s to FloatValue\n", o.Val.Str())
+						}
+					}
+					retVal.Val = finalVal
+					break;
+				}
 				return retVal
 			},
 		},
