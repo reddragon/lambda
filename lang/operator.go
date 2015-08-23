@@ -9,8 +9,8 @@ type Operator struct {
 
 const (
 	// Operators
-	Add string = "+"
-	Sub string = "-"
-	Mul string = "*"
-	Div string = "/"
+	add string = "+"
+	sub string = "-"
+	mul string = "*"
+	div string = "/"
 )

@@ -14,13 +14,13 @@ func checkArgLen(operatorName string, operands *[]Atom, expectedArgs int) error 
 	return nil
 }
 
-func checkArgTypes(operatorName string, operands *[]Atom, allowedTypes []ValueType) (map[ValueType]int, error) {
-	typesFound := make(map[ValueType]int, 0)
+func checkArgTypes(operatorName string, operands *[]Atom, allowedTypes []valueType) (map[valueType]int, error) {
+	typesFound := make(map[valueType]int, 0)
 	for _, operand := range *operands {
 		exists := false
-		typesFound[operand.Val.GetValueType()]++
+		typesFound[operand.Val.getValueType()]++
 		for _, t := range allowedTypes {
-			if operand.Val.GetValueType() == t {
+			if operand.Val.getValueType() == t {
 				exists = true
 				break
 			}
@@ -28,7 +28,7 @@ func checkArgTypes(operatorName string, operands *[]Atom, allowedTypes []ValueTy
 		if !exists {
 			return nil, errors.New(
 				fmt.Sprintf("For operator %s, operand %s is of unexpected type: %s.",
-					operatorName, operand, operand.Val.GetValueType()))
+					operatorName, operand, operand.Val.getValueType()))
 		}
 	}
 	return typesFound, nil

@@ -22,7 +22,7 @@ func EvalAST(env *LangEnv, node *ASTNode) Atom {
 	if node.isValue {
 		// TODO Check here if the value is a proper value
 		// value, err := strconv.Atoi(node.value)
-		value, err := GetValue(node.value)
+		value, err := getValue(node.value)
 		if err != nil {
 			retVal.Err = errStr("value", node.value)
 		} else {

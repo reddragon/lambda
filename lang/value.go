@@ -7,30 +7,28 @@ import (
 )
 
 // Different types of values supported
-type ValueType string
+type valueType string
 
 const (
 	// Value type
-	StringType = "StringType"
-	IntType    = "IntType"
-	FloatType  = "FloatType"
+	stringType = "stringType"
+	intType    = "intType"
+	floatType  = "floatType"
 )
 
 type Value interface {
-	GetValueType() ValueType
-	To(ValueType) (Value, error)
 	Str() string
+	getValueType() valueType
+	to(valueType) (Value, error)
 	ofType(string) bool
 	newValue(string) Value
-	// TODO
-	// Add other methods
 }
 
 // Algorithm
 // 1. Go through all the value types, in order.
 // 2. Pick the highest value type that complies.
 // 3. Return that value type.
-func GetValue(token string) (Value, error) {
+func getValue(token string) (Value, error) {
 	// TODO Use env types
 	types := builtinTypes()
 	for _, t := range types {
@@ -54,31 +52,31 @@ NaN
 >
 */
 
-func typeConvError(from, to ValueType) error {
+func typeConvError(from, to valueType) error {
 	return errors.New(fmt.Sprintf("Cannot convert %s to %s", from, to))
 }
 
-type StringValue struct {
+type stringValue struct {
 	value string
 }
 
-func (v StringValue) GetValueType() ValueType {
-	return StringType
+func (v stringValue) getValueType() valueType {
+	return stringType
 }
 
-func (v StringValue) To(targetType ValueType) (Value, error) {
+func (v stringValue) to(targetType valueType) (Value, error) {
 	switch targetType {
-	case StringType:
+	case stringType:
 		return v, nil
 	}
-	return nil, typeConvError(v.GetValueType(), targetType)
+	return nil, typeConvError(v.getValueType(), targetType)
 }
 
-func (v StringValue) Str() string {
+func (v stringValue) Str() string {
 	return v.value
 }
 
-func (v StringValue) ofType(targetValue string) bool {
+func (v stringValue) ofType(targetValue string) bool {
 	valLen := len(targetValue)
 	if valLen < 2 {
 		return false
@@ -92,33 +90,33 @@ func (v StringValue) ofType(targetValue string) bool {
 	return false
 }
 
-func (v StringValue) newValue(str string) Value {
-	val := new(StringValue)
+func (v stringValue) newValue(str string) Value {
+	val := new(stringValue)
 	val.value = str
 	return val
 }
 
-type IntValue struct {
+type intValue struct {
 	value int64
 }
 
-func (v IntValue) GetValueType() ValueType {
-	return IntType
+func (v intValue) getValueType() valueType {
+	return intType
 }
 
-func (v IntValue) To(targetType ValueType) (Value, error) {
+func (v intValue) to(targetType valueType) (Value, error) {
 	switch targetType {
-	case IntType:
+	case intType:
 		return v, nil
-	case FloatType:
-		val := new(FloatValue)
+	case floatType:
+		val := new(floatValue)
 		val.value = float64(v.value)
 		return val, nil
 	}
-	return nil, typeConvError(v.GetValueType(), targetType)
+	return nil, typeConvError(v.getValueType(), targetType)
 }
 
-func (v IntValue) ofType(targetValue string) bool {
+func (v intValue) ofType(targetValue string) bool {
 	_, err := strconv.ParseInt(targetValue, 0, 64)
 	if err != nil {
 		// fmt.Printf("Error processing %s: %s", targetValue, err)
@@ -127,37 +125,37 @@ func (v IntValue) ofType(targetValue string) bool {
 	return true
 }
 
-func (v IntValue) Str() string {
+func (v intValue) Str() string {
 	return strconv.FormatInt(v.value, 10)
 }
 
-func (v IntValue) newValue(str string) Value {
+func (v intValue) newValue(str string) Value {
 	intVal, err := strconv.ParseInt(str, 0, 64)
 	if err != nil {
 		return nil
 	}
-	val := new(IntValue)
+	val := new(intValue)
 	val.value = intVal
 	return val
 }
 
-type FloatValue struct {
+type floatValue struct {
 	value float64
 }
 
-func (v FloatValue) GetValueType() ValueType {
-	return FloatType
+func (v floatValue) getValueType() valueType {
+	return floatType
 }
 
-func (v FloatValue) To(targetType ValueType) (Value, error) {
+func (v floatValue) to(targetType valueType) (Value, error) {
 	switch targetType {
-	case FloatType:
+	case floatType:
 		return v, nil
 	}
-	return nil, typeConvError(v.GetValueType(), targetType)
+	return nil, typeConvError(v.getValueType(), targetType)
 }
 
-func (v FloatValue) ofType(targetValue string) bool {
+func (v floatValue) ofType(targetValue string) bool {
 	_, err := strconv.ParseFloat(targetValue, 64)
 	if err != nil {
 		// fmt.Printf("Error processing %s: %s", targetValue, err)
@@ -166,16 +164,16 @@ func (v FloatValue) ofType(targetValue string) bool {
 	return true
 }
 
-func (v FloatValue) Str() string {
+func (v floatValue) Str() string {
 	return strconv.FormatFloat(v.value, 'g', -1, 64)
 }
 
-func (v FloatValue) newValue(str string) Value {
+func (v floatValue) newValue(str string) Value {
 	floatVal, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 		return nil
 	}
-	val := new(FloatValue)
+	val := new(floatValue)
 	val.value = floatVal
 	return val
 }
