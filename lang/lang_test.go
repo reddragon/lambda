@@ -43,4 +43,6 @@ func TestBasicLang(t *testing.T) {
   malformedQueryTest(")", t, env)
   malformedQueryTest("(", t, env)
   malformedQueryTest("]]]", t, env)
+
+  malformedQueryTest("(/ 1 0)", t, env)
 }
