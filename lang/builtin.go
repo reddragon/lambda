@@ -2,6 +2,7 @@ package lang
 
 import (
 	"fmt"
+	"errors"
 )
 
 func addOperator(opMap map[string]*Operator, op *Operator) {
@@ -9,19 +10,26 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 }
 
 // Algorithm:
-// 1. We already know the type -> count mapping.
+// 1. We get the type -> count mapping.
 // 2. If there is only one type, there is nothing to do.
 // 3. If there are multiple, pick the one with the highest precedence.
 // 4. Try and cast all operand values to that type. Error out if any of them
 //    resists. Because, resistance is futile.
-//
-// TODO
-// Mix typeCoerce() and checkArgTypes()
-func typeCoerce(operands *[]Atom, typesCountMap map[ValueType]int, typePrecendenceMap map[ValueType]int) (ValueType, error) {
+func typeCoerce(operatorName string, operands *[]Atom, expectedArgs int, typePrecendenceMap map[ValueType]int) (ValueType, error) {
+	var err error
+	err = checkArgLen(Add, operands, 2)
+	if err != nil {
+		return "", err
+	}
+
+	var typesCountMap map[ValueType]int
+	typesCountMap, err = checkArgTypes(operatorName, operands, []ValueType{IntType, FloatType})
+	if err != nil {
+		return "", err
+	}
+
 	if len(typesCountMap) == 1 {
-		fmt.Printf("Value initially was: %s\n", (*operands)[0].Val.Str())
 		valType := (*operands)[0].Val.GetValueType()
-		fmt.Printf("Only one type (%s) in the typesCountMap, so nothing to do.\n", valType)
 		return valType, nil
 	}
 
@@ -38,10 +46,11 @@ func typeCoerce(operands *[]Atom, typesCountMap map[ValueType]int, typePrecenden
 		}
 	}
 
-	for _, o := range *operands {
-		if o.Val.GetValueType() != finalType {
+	for i := 0; i < len(*operands); i++ {
+		if (*operands)[i].Val.GetValueType() != finalType {
 			var err error
-			o.Val, err = o.Val.To(finalType)
+			(*operands)[i].Val, err = (*operands)[i].Val.To(finalType)
+
 			if err != nil {
 				return "", err
 			}
@@ -56,29 +65,16 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   Add,
+			symbol: Add,
 			argCount: 2,
 			handler: func(operands []Atom) Atom {
 				var retVal Atom
-				retVal.Err = checkArgLen(Add, operands, 2)
-				if retVal.Err != nil {
-					return retVal
-				}
-
-				var typesCountMap map[ValueType]int
-				typesCountMap, retVal.Err = checkArgTypes(Add, operands, []ValueType{IntType, FloatType})
-				if retVal.Err != nil {
-					return retVal
-				}
-
-				// Type Coercion
 				typePrecedenceMap := map[ValueType]int{IntType: 1, FloatType: 2}
 				var finalType ValueType
-				finalType, retVal.Err = typeCoerce(&operands, typesCountMap, typePrecedenceMap)
+				finalType, retVal.Err = typeCoerce(Add, &operands, 2, typePrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
 				}
-				fmt.Printf("Did type-coercion, final type was: %s\n", finalType)
 
 				switch finalType {
 				case IntType:
@@ -114,63 +110,184 @@ func builtinOperators() map[string]*Operator {
 		},
 	)
 
-	/*
-		addOperator(opMap,
-			&Operator{
-				symbol:   Sub,
-				argCount: 2,
-				handler: func(operands []Atom) Atom {
-					var retVal Atom
-					argCheckErr := checkArgLen(Sub, operands, 2)
-					if argCheckErr.Err != nil {
-						return argCheckErr
-					}
-					// TODO
-					// Do type checks
-
-					retVal.Val = operands[0].Val - operands[1].Val
+	addOperator(opMap,
+		&Operator{
+			symbol: Sub,
+			argCount: 2,
+			handler: func(operands []Atom) Atom {
+				var retVal Atom
+				typePrecedenceMap := map[ValueType]int{IntType: 1, FloatType: 2}
+				var finalType ValueType
+				finalType, retVal.Err = typeCoerce(Sub, &operands, 2, typePrecedenceMap)
+				if retVal.Err != nil {
 					return retVal
-				},
-			},
-		)
+				}
 
-		addOperator(opMap,
-			&Operator{
-				symbol:   Mul,
-				argCount: 2,
-				handler: func(operands []Atom) Atom {
-					var retVal Atom
-					argCheckErr := checkArgLen(Mul, operands, 2)
-					if argCheckErr.Err != nil {
-						return argCheckErr
+				switch finalType {
+				case IntType:
+					var finalVal IntValue
+					var val1, val2 *IntValue
+					finalVal.value = 0
+
+					var ok bool
+					val1, ok = operands[0].Val.(*IntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to IntValue\n", operands[0].Val.Str())
 					}
-					// TODO
-					// Do type checks
 
-					retVal.Val = operands[0].Val * operands[1].Val
-					return retVal
-				},
-			},
-		)
-
-		addOperator(opMap,
-			&Operator{
-				symbol:   Div,
-				argCount: 2,
-				handler: func(operands []Atom) Atom {
-					var retVal Atom
-					argCheckErr := checkArgLen(Div, operands, 2)
-					if argCheckErr.Err != nil {
-						return argCheckErr
+					val2, ok = operands[1].Val.(*IntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to IntValue\n", operands[0].Val.Str())
 					}
-					// TODO
-					// Do type checks
+					finalVal.value = val1.value - val2.value
+					retVal.Val = finalVal
+					break;
 
-					retVal.Val = operands[0].Val / operands[1].Val
-					return retVal
-				},
+				case FloatType:
+					var finalVal FloatValue
+					var val1, val2 *FloatValue
+					finalVal.value = 0
+
+					var ok bool
+					val1, ok = operands[0].Val.(*FloatValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to FloatValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(*FloatValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to FloatValue\n", operands[0].Val.Str())
+					}
+					finalVal.value = val1.value - val2.value
+					retVal.Val = finalVal
+					break;
+				}
+				return retVal
 			},
-		) */
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol: Mul,
+			argCount: 2,
+			handler: func(operands []Atom) Atom {
+				var retVal Atom
+				typePrecedenceMap := map[ValueType]int{IntType: 1, FloatType: 2}
+				var finalType ValueType
+				finalType, retVal.Err = typeCoerce(Mul, &operands, 2, typePrecedenceMap)
+				if retVal.Err != nil {
+					return retVal
+				}
+
+				switch finalType {
+				case IntType:
+					var finalVal IntValue
+					var val1, val2 *IntValue
+					finalVal.value = 1
+
+					var ok bool
+					val1, ok = operands[0].Val.(*IntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to IntValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(*IntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to IntValue\n", operands[0].Val.Str())
+					}
+					finalVal.value = val1.value * val2.value
+					retVal.Val = finalVal
+					break;
+
+				case FloatType:
+					var finalVal FloatValue
+					var val1, val2 *FloatValue
+					finalVal.value = 0
+
+					var ok bool
+					val1, ok = operands[0].Val.(*FloatValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to FloatValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(*FloatValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to FloatValue\n", operands[0].Val.Str())
+					}
+					finalVal.value = val1.value * val2.value
+					retVal.Val = finalVal
+					break;
+				}
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol: Div,
+			argCount: 2,
+			handler: func(operands []Atom) Atom {
+				var retVal Atom
+				typePrecedenceMap := map[ValueType]int{IntType: 1, FloatType: 2}
+				var finalType ValueType
+				finalType, retVal.Err = typeCoerce(Div, &operands, 2, typePrecedenceMap)
+				if retVal.Err != nil {
+					return retVal
+				}
+				
+				switch finalType {
+				case IntType:
+					var finalVal IntValue
+					var val1, val2 *IntValue
+					finalVal.value = 1
+
+					var ok bool
+					val1, ok = operands[0].Val.(*IntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to IntValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(*IntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to IntValue\n", operands[0].Val.Str())
+					}
+					if val2.value != 0 {
+						finalVal.value = val1.value / val2.value
+						retVal.Val = finalVal
+					} else {
+						retVal.Err = errors.New(fmt.Sprintf("Divide by zero"))
+					}
+					break;
+
+				case FloatType:
+					var finalVal FloatValue
+					var val1, val2 *FloatValue
+					finalVal.value = 0
+
+					var ok bool
+					val1, ok = operands[0].Val.(*FloatValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to FloatValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(*FloatValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to FloatValue\n", operands[0].Val.Str())
+					}
+					if val2.value != 0 {
+						finalVal.value = val1.value / val2.value
+						retVal.Val = finalVal
+					} else {
+						retVal.Err = errors.New(fmt.Sprintf("Divide by zero"))
+					}
+					break;
+				}
+				return retVal
+			},
+		},
+	)
 	return opMap
 }
 

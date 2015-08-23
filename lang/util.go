@@ -5,18 +5,18 @@ import (
 	"fmt"
 )
 
-func checkArgLen(operatorName string, operands []Atom, expectedArgs int) error {
-	if len(operands) != expectedArgs {
+func checkArgLen(operatorName string, operands *[]Atom, expectedArgs int) error {
+	if len(*operands) != expectedArgs {
 		return errors.New(
 			fmt.Sprintf("For operator %s, expected %d args, but got %d.",
-				operatorName, expectedArgs, len(operands)))
+				operatorName, expectedArgs, len(*operands)))
 	}
 	return nil
 }
 
-func checkArgTypes(operatorName string, operands []Atom, allowedTypes []ValueType) (map[ValueType]int, error) {
+func checkArgTypes(operatorName string, operands *[]Atom, allowedTypes []ValueType) (map[ValueType]int, error) {
 	typesFound := make(map[ValueType]int, 0)
-	for _, operand := range operands {
+	for _, operand := range *operands {
 		exists := false
 		typesFound[operand.Val.GetValueType()]++
 		for _, t := range allowedTypes {

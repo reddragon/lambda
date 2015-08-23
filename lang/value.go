@@ -111,7 +111,9 @@ func (v IntValue) To(targetType ValueType) (Value, error) {
 	case IntType:
 		return v, nil
 	case FloatType:
-		return FloatValue{float64(v.value)}, nil
+		val := new(FloatValue)
+		val.value = float64(v.value)
+		return val, nil
 	}
 	return nil, typeConvError(v.GetValueType(), targetType)
 }
