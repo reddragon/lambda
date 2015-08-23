@@ -1,8 +1,8 @@
 package lang
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 func addOperator(opMap map[string]*Operator, op *Operator) {
@@ -65,7 +65,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol: Add,
+			symbol:   Add,
 			argCount: 2,
 			handler: func(operands []Atom) Atom {
 				var retVal Atom
@@ -89,7 +89,7 @@ func builtinOperators() map[string]*Operator {
 						}
 					}
 					retVal.Val = finalVal
-					break;
+					break
 
 				case FloatType:
 					var finalVal FloatValue
@@ -103,7 +103,7 @@ func builtinOperators() map[string]*Operator {
 						}
 					}
 					retVal.Val = finalVal
-					break;
+					break
 				}
 				return retVal
 			},
@@ -112,7 +112,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol: Sub,
+			symbol:   Sub,
 			argCount: 2,
 			handler: func(operands []Atom) Atom {
 				var retVal Atom
@@ -141,7 +141,7 @@ func builtinOperators() map[string]*Operator {
 					}
 					finalVal.value = val1.value - val2.value
 					retVal.Val = finalVal
-					break;
+					break
 
 				case FloatType:
 					var finalVal FloatValue
@@ -160,7 +160,7 @@ func builtinOperators() map[string]*Operator {
 					}
 					finalVal.value = val1.value - val2.value
 					retVal.Val = finalVal
-					break;
+					break
 				}
 				return retVal
 			},
@@ -169,7 +169,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol: Mul,
+			symbol:   Mul,
 			argCount: 2,
 			handler: func(operands []Atom) Atom {
 				var retVal Atom
@@ -198,7 +198,7 @@ func builtinOperators() map[string]*Operator {
 					}
 					finalVal.value = val1.value * val2.value
 					retVal.Val = finalVal
-					break;
+					break
 
 				case FloatType:
 					var finalVal FloatValue
@@ -217,7 +217,7 @@ func builtinOperators() map[string]*Operator {
 					}
 					finalVal.value = val1.value * val2.value
 					retVal.Val = finalVal
-					break;
+					break
 				}
 				return retVal
 			},
@@ -226,7 +226,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol: Div,
+			symbol:   Div,
 			argCount: 2,
 			handler: func(operands []Atom) Atom {
 				var retVal Atom
@@ -236,7 +236,7 @@ func builtinOperators() map[string]*Operator {
 				if retVal.Err != nil {
 					return retVal
 				}
-				
+
 				switch finalType {
 				case IntType:
 					var finalVal IntValue
@@ -259,7 +259,7 @@ func builtinOperators() map[string]*Operator {
 					} else {
 						retVal.Err = errors.New(fmt.Sprintf("Divide by zero"))
 					}
-					break;
+					break
 
 				case FloatType:
 					var finalVal FloatValue
@@ -282,7 +282,7 @@ func builtinOperators() map[string]*Operator {
 					} else {
 						retVal.Err = errors.New(fmt.Sprintf("Divide by zero"))
 					}
-					break;
+					break
 				}
 				return retVal
 			},
