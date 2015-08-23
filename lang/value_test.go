@@ -10,7 +10,7 @@ type TestPair struct {
 }
 
 func doTypeChecks(v Value, cases []TestPair, t *testing.T) {
-	vtype := v.GetValueType()
+	vtype := v.getValueType()
 	for _, p := range cases {
 		str, ok := p.a.(string)
 		if !ok {
@@ -27,7 +27,7 @@ func doTypeChecks(v Value, cases []TestPair, t *testing.T) {
 }
 
 func doChecks(v Value, cases []TestPair, t *testing.T) {
-	vtype := v.GetValueType()
+	vtype := v.getValueType()
 	for _, p := range cases {
 		_, ok := p.a.(string)
 		if !ok {
@@ -42,8 +42,8 @@ func doChecks(v Value, cases []TestPair, t *testing.T) {
 	}
 }
 
-func TestIntValue(t *testing.T) {
-	iv := new(IntValue)
+func TestintValue(t *testing.T) {
+	iv := new(intValue)
 	cases := make([]TestPair, 0)
 	cases = append(cases, TestPair{"1.2", false})
 	cases = append(cases, TestPair{"1", true})
@@ -60,19 +60,19 @@ func TestIntValue(t *testing.T) {
 	doChecks(iv, strCases, t)
 
 	iv.value = 2
-	conv, err := iv.To(IntType)
-	if err != nil || conv.GetValueType() != IntType || conv.Str() != iv.Str() {
-		t.Errorf("Could not convert from IntType to IntType")
+	conv, err := iv.to(intType)
+	if err != nil || conv.getValueType() != intType || conv.Str() != iv.Str() {
+		t.Errorf("Could not convert from intType to intType")
 	}
 
-	conv, err = iv.To(FloatType)
-	if err != nil || conv.GetValueType() != FloatType || conv.Str() != iv.Str() {
-		t.Errorf("Could not convert from IntType to FloatType")
+	conv, err = iv.to(floatType)
+	if err != nil || conv.getValueType() != floatType || conv.Str() != iv.Str() {
+		t.Errorf("Could not convert from intType to floatType")
 	}
 }
 
-func TestFloatValue(t *testing.T) {
-	fv := new(FloatValue)
+func TestfloatValue(t *testing.T) {
+	fv := new(floatValue)
 	cases := make([]TestPair, 0)
 	cases = append(cases, TestPair{"1.2", true})
 	cases = append(cases, TestPair{"1", true})
@@ -92,8 +92,8 @@ func TestFloatValue(t *testing.T) {
 	doChecks(fv, strCases, t)
 }
 
-func TestStringValue(t *testing.T) {
-	sv := new(StringValue)
+func TeststringValue(t *testing.T) {
+	sv := new(stringValue)
 	cases := make([]TestPair, 0)
 	cases = append(cases, TestPair{"", false})
 	cases = append(cases, TestPair{"''", true})
@@ -111,18 +111,18 @@ func TestStringValue(t *testing.T) {
 }
 
 func TestTypeInfer(t *testing.T) {
-	v, e := GetValue("1")
-	if v == nil || v.GetValueType() != IntType || e != nil {
-		t.Errorf("Could not correctly GetValue(1)")
+	v, e := getValue("1")
+	if v == nil || v.getValueType() != intType || e != nil {
+		t.Errorf("Could not correctly getValue(1)")
 	}
 
-	v, e = GetValue("1.2")
-	if v == nil || v.GetValueType() != FloatType || e != nil {
-		t.Errorf("Could not correctly GetValue(1)")
+	v, e = getValue("1.2")
+	if v == nil || v.getValueType() != floatType || e != nil {
+		t.Errorf("Could not correctly getValue(1)")
 	}
 
-	v, e = GetValue("'xyz'")
-	if v == nil || v.GetValueType() != StringType || e != nil {
-		t.Errorf("Could not correctly GetValue(1)")
+	v, e = getValue("'xyz'")
+	if v == nil || v.getValueType() != stringType || e != nil {
+		t.Errorf("Could not correctly getValue(1)")
 	}
 }
