@@ -4,7 +4,7 @@ This is a WIP!
 A Lisp dialect written in Golang, which will hopefully 'eclipse' other Lisp dialects :) 
 
 I have been amazed at the kind of things that we can achieve with simple s-expressions. This is my attempt at writing yet
-another Lisp dialect. Right now what we have is a simple REPL, which can work on simple operators like +, -, * and /. It ~~can't even~~ can do floating math.
+another Lisp dialect. Right now what we have is a simple REPL, which can work on simple operators like +, -, * and /. It ~~can't even~~ can do floating-point math.
 
 ### How to Use
 * `go get github.com/reddragon/eclisp`
