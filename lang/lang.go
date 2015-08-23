@@ -28,7 +28,7 @@ func Eval(exp string, env *LangEnv) *Atom {
 	retVal := new(Atom)
 	result := evalAST(env, astNode)
 	retVal.Val = result.Val
-	retVal.Err = retVal.Err
+	retVal.Err = result.Err
 	return retVal
 }
 
@@ -37,8 +37,6 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 	retVal.Err = nil
 
 	if node.isValue {
-		// TODO Check here if the value is a proper value
-		// value, err := strconv.Atoi(node.value)
 		value, err := getValue(node.value)
 		if err != nil {
 			retVal.Err = errStr("value", node.value)
