@@ -7,20 +7,14 @@ import (
 )
 
 func process(env *l.LangEnv, line string) {
-	node, _, err := l.GetAST(line)
-	if err != nil {
-		fmt.Printf("Error: %s\n", err)
+	retVal := l.Eval(line, env)
+	if retVal.Err != nil {
+		fmt.Printf("Error: %s\n", retVal.Err)
 	} else {
-		var retVal l.Atom
-		retVal = l.EvalAST(env, node)
-		if retVal.Err != nil {
-			fmt.Printf("Error: %s\n", retVal.Err)
+		if retVal.Val != nil {
+			fmt.Printf("%s\n", retVal.Val.Str())
 		} else {
-			if retVal.Val != nil {
-				fmt.Printf("%s\n", retVal.Val.Str())
-			} else {
-				fmt.Printf("\n")
-			}
+			fmt.Printf("\n")
 		}
 	}
 }

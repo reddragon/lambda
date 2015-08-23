@@ -10,12 +10,29 @@ import (
 // An Atom is either a value, or an error
 type Atom struct {
 	Err error
-	// TODO Value should be of type Value
-	// Val int
 	Val Value
 }
 
-func EvalAST(env *LangEnv, node *ASTNode) Atom {
+func Eval(exp string, env *LangEnv) *Atom {
+	astNode, _, err := getAST(exp)
+	if err != nil {
+		retVal := new(Atom)
+		retVal.Err = err
+		return retVal
+	}
+
+	// This round-about way is not necessary. Gomobile trips if you return
+	// structs by value.
+	// TODO
+	// Remove this hack, pending: https://github.com/golang/go/issues/11318
+	retVal := new(Atom)
+	result := evalAST(env, astNode)
+	retVal.Val = result.Val
+	retVal.Err = retVal.Err
+	return retVal
+}
+
+func evalAST(env *LangEnv, node *ASTNode) Atom {
 	var retVal Atom
 	retVal.Err = nil
 
@@ -31,7 +48,7 @@ func EvalAST(env *LangEnv, node *ASTNode) Atom {
 		return retVal
 	}
 	if len(node.children) == 1 {
-		return EvalAST(env, node.children[0])
+		return evalAST(env, node.children[0])
 	}
 
 	// Assuming that the first child is an operand
@@ -54,7 +71,7 @@ func EvalAST(env *LangEnv, node *ASTNode) Atom {
 
 	operands := make([]Atom, 0)
 	for i := 1; i < len(node.children); i++ {
-		v := EvalAST(env, node.children[i])
+		v := evalAST(env, node.children[i])
 		if v.Err != nil {
 			return v
 		}

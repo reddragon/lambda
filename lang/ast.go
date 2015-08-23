@@ -24,12 +24,12 @@ func errStr(expected, found string) error {
 }
 
 // This method gets you the AST of a given expression.
-func GetAST(exp string) (*ASTNode, []string, error) {
+func getAST(exp string) (*ASTNode, []string, error) {
 	tokens := tokenize(exp)
 	if len(tokens) == 0 {
 		return nil, nil, errors.New("Nothing to evaluate")
 	}
-	return getAST(tokens)
+	return getASTOfTokens(tokens)
 }
 
 func tokenize(exp string) []string {
@@ -48,7 +48,7 @@ func tokenize(exp string) []string {
 
 // This method does the heavy-lifting of building an AST, once an expression
 // is tokenized.
-func getAST(tokens []string) (*ASTNode, []string, error) {
+func getASTOfTokens(tokens []string) (*ASTNode, []string, error) {
 	var token = ""
 	tokensLen := len(tokens)
 	// fmt.Printf("Processing tokens: %q, len: %d\n", tokens, tokensLen)
@@ -87,10 +87,10 @@ func getAST(tokens []string) (*ASTNode, []string, error) {
 			if tokens[0] != openBracket {
 				token, tokens = pop(tokens)
 				// fmt.Printf("Processing val: %s\n", token)
-				childNode, _, err = getAST([]string{token})
+				childNode, _, err = getASTOfTokens([]string{token})
 			} else {
 				// fmt.Printf("Processing inner AST: %q\n", tokens)
-				childNode, tokens, err = getAST(tokens)
+				childNode, tokens, err = getASTOfTokens(tokens)
 			}
 			if err != nil {
 				return nil, tokens, err

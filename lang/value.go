@@ -7,7 +7,7 @@ import (
 )
 
 // Different types of values supported
-type valueType string
+type valueType interface{}
 
 const (
 	// Value type
