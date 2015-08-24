@@ -1,10 +1,8 @@
 package lang
 
 import (
-	// "bufio"
 	"errors"
 	"fmt"
-	// "strconv"
 )
 
 // An Atom is either a value, or an error
@@ -58,8 +56,6 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 		return retVal
 	}
 
-	// fmt.Printf("ArgCount: %d\n", argCount)
-
 	if len(node.children)-1 != operator.argCount {
 		retVal.Err = errors.New(
 			fmt.Sprintf("Received %d arguments for operator %s, expected: %d",
@@ -73,10 +69,8 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 		if v.Err != nil {
 			return v
 		}
-		// fmt.Printf("Pushing value: %d\n", v.Val)
 		operands = append(operands, v)
 	}
-	// fmt.Printf("Len of operands: %d\n", len(operands))
 	v := operator.handler(operands)
 	if v.Err != nil {
 		return v

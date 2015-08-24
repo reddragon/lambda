@@ -51,7 +51,6 @@ func tokenize(exp string) []string {
 func getASTOfTokens(tokens []string) (*ASTNode, []string, error) {
 	var token = ""
 	tokensLen := len(tokens)
-	// fmt.Printf("Processing tokens: %q, len: %d\n", tokens, tokensLen)
 	// If it is an empty list of tokens, the AST is a nil node
 	if tokensLen == 0 {
 		return nil, tokens, nil
@@ -86,10 +85,8 @@ func getASTOfTokens(tokens []string) (*ASTNode, []string, error) {
 			// If this is not an open brace, this is a single value
 			if tokens[0] != openBracket {
 				token, tokens = pop(tokens)
-				// fmt.Printf("Processing val: %s\n", token)
 				childNode, _, err = getASTOfTokens([]string{token})
 			} else {
-				// fmt.Printf("Processing inner AST: %q\n", tokens)
 				childNode, tokens, err = getASTOfTokens(tokens)
 			}
 			if err != nil {
@@ -97,7 +94,6 @@ func getASTOfTokens(tokens []string) (*ASTNode, []string, error) {
 			}
 			node.children = append(node.children, childNode)
 		}
-		// fmt.Printf("Done with inner operands, tokens: %q\n", tokens)
 		if len(tokens) == 0 {
 			return nil, tokens, errStr(closedBracket, "nil")
 		}
