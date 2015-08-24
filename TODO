@@ -1,18 +1,4 @@
 eclisp TODO
-1.
-type binaryOp {
-  fn(T)(value a, value b) eval = ?,
-}
 
-static fn(valueType)(string) getValueType = ? // What kind of value is this?
-// go through all value types and check if its of a particular type
-
-type value {
-  enum valueType = ?
-  fn(bool)(string) ofType = ?
-  fn(string)() toString = ?
-  static fn(value)(string) getValue = ? // get value from a string
-  fn(value)(valueType) cast = ? // force cast to a value type
-}
-
-1. Install the patched version of Go (), and then make it using ./make.bash, but set GOROOT_BOOTSTRAP to GOROOT
+* Allow +, * to have > 2 operands.
+* Work on variables.
