@@ -49,7 +49,6 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 
 	// Assuming that the first child is an operand
 	symbol := node.children[0].value
-	// fmt.Printf("Will work on the operator %s\n", operator)
 	operator := env.getOperator(symbol)
 	if operator == nil {
 		retVal.Err = errors.New(fmt.Sprintf("Unknown operator '%s'", symbol))
