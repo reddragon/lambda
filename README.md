@@ -25,6 +25,15 @@ eclisp> (- (/ (* (+ 1 2) 3) 3) 2)
 eclisp> (/ 22 7.0)
 3.142857142857143
 
+eclisp> (defvar pi 3.14159265359)
+3.14159265359
+
+eclisp> (defvar r 10)
+10
+
+eclisp> (* pi (* r r))
+314.159265359
+
 eclisp> (/ 1 0)
 Error: Divide by zero
 
