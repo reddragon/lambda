@@ -3,7 +3,7 @@ package lang
 type Operator struct {
 	symbol   string
 	argCount int
-	handler  (func([]Atom) Atom)
+	handler  (func(*LangEnv, []Atom) Atom)
 }
 
 const (
@@ -12,4 +12,5 @@ const (
 	sub string = "-"
 	mul string = "*"
 	div string = "/"
+	def string = "defvar"
 )

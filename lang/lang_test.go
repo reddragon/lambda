@@ -7,7 +7,7 @@ import (
 func saneQueryTest(query, expected string, t *testing.T, env *LangEnv) {
 	val := Eval(query, env)
 	if val.Val == nil || val.Err != nil {
-		t.Errorf("Expected %s to not be nil", query)
+		t.Errorf("Expected %s to not be nil. Err: %s", query, val.Err)
 	} else {
 		if val.Val.Str() != expected {
 			t.Errorf("Expected %s to be %s, but was %s", query, expected, val.Val.Str())
@@ -37,6 +37,11 @@ func TestBasicLang(t *testing.T) {
 	saneQueryTest("(- 1.3 2.1)", "-0.8", t, env)
 	saneQueryTest("(* 1.3 2)", "2.6", t, env)
 	saneQueryTest("(/ 1.3 2)", "0.65", t, env)
+
+	saneQueryTest("(defvar x 2.0)", "2", t, env)
+	saneQueryTest("(+ x 2.0)", "4", t, env)
+	saneQueryTest("(defvar y 1.9)", "1.9", t, env)
+	saneQueryTest("(* x y)", "3.8", t, env)
 
 	malformedQueryTest(")(", t, env)
 	malformedQueryTest(")", t, env)

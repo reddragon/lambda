@@ -3,6 +3,7 @@ package lang
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 )
 
@@ -14,6 +15,7 @@ const (
 	stringType = "stringType"
 	intType    = "intType"
 	floatType  = "floatType"
+	varType    = "varType"
 )
 
 type Value interface {
@@ -28,14 +30,21 @@ type Value interface {
 // 1. Go through all the value types, in order.
 // 2. Pick the highest value type that complies.
 // 3. Return that value type.
-func getValue(token string) (Value, error) {
+func getValue(env *LangEnv, token string) (Value, error) {
 	// TODO Use env types
 	types := builtinTypes()
 	for _, t := range types {
 		if t.ofType(token) {
+			if t.getValueType() == varType {
+				val := env.varMap[token]
+				if val != nil {
+					return val, nil
+				}
+			}
 			return t.newValue(token), nil
 		}
 	}
+
 	return nil, errors.New(fmt.Sprintf("Could not get type for token: %s", token))
 }
 
@@ -175,5 +184,35 @@ func (v floatValue) newValue(str string) Value {
 	}
 	val := new(floatValue)
 	val.value = floatVal
+	return val
+}
+
+type varValue struct {
+	value string
+}
+
+func (v varValue) getValueType() valueType {
+	return varType
+}
+
+func (v varValue) to(targetType valueType) (Value, error) {
+	return nil, typeConvError(v.getValueType(), targetType)
+}
+
+func (v varValue) ofType(targetValue string) bool {
+	matched, err := regexp.MatchString("[a-zA-Z]+[a-zA-Z0-9]*", targetValue)
+	if matched == false || err != nil {
+		return false
+	}
+	return true
+}
+
+func (v varValue) Str() string {
+	return v.value
+}
+
+func (v varValue) newValue(str string) Value {
+	val := new(varValue)
+	val.value = str
 	return val
 }

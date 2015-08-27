@@ -17,11 +17,6 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 //    resists. Because, resistance is futile.
 func typeCoerce(operatorName string, operands *[]Atom, expectedArgs int, typePrecendenceMap map[valueType]int) (valueType, error) {
 	var err error
-	err = checkArgLen(add, operands, 2)
-	if err != nil {
-		return "", err
-	}
-
 	var typesCountMap map[valueType]int
 	typesCountMap, err = checkArgTypes(operatorName, operands, []valueType{intType, floatType})
 	if err != nil {
@@ -67,7 +62,7 @@ func builtinOperators() map[string]*Operator {
 		&Operator{
 			symbol:   add,
 			argCount: 2,
-			handler: func(operands []Atom) Atom {
+			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
@@ -114,7 +109,7 @@ func builtinOperators() map[string]*Operator {
 		&Operator{
 			symbol:   sub,
 			argCount: 2,
-			handler: func(operands []Atom) Atom {
+			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
@@ -171,7 +166,7 @@ func builtinOperators() map[string]*Operator {
 		&Operator{
 			symbol:   mul,
 			argCount: 2,
-			handler: func(operands []Atom) Atom {
+			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
@@ -228,7 +223,7 @@ func builtinOperators() map[string]*Operator {
 		&Operator{
 			symbol:   div,
 			argCount: 2,
-			handler: func(operands []Atom) Atom {
+			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
@@ -288,13 +283,48 @@ func builtinOperators() map[string]*Operator {
 			},
 		},
 	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:   def,
+			argCount: 2,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				vtype1 := operands[0].Val.getValueType()
+				vtype2 := operands[1].Val.getValueType()
+
+				if vtype1 != varType {
+					retVal.Err = errors.New(fmt.Sprintf("For %s, expected %s to be %s, but was %s", def, operands[0].Val.Str(), varType, vtype1))
+					return retVal
+				}
+
+				if vtype2 == varType {
+					retVal.Err = errors.New(fmt.Sprintf("For %s, expected %s to not be %s, but was.", def, operands[1].Val.Str(), varType))
+					return retVal
+				}
+
+				sym := operands[0].Val.Str()
+				if env.getOperator(sym) != nil {
+					retVal.Err = errors.New(fmt.Sprintf("Cannot use %s as a variable, as it is defined as an operator.", sym))
+					return retVal
+				}
+
+				env.varMap[sym] = operands[1].Val
+				retVal.Val = operands[1].Val
+				return retVal
+			},
+		},
+	)
 	return opMap
 }
 
 func builtinTypes() []Value {
 	types := make([]Value, 0)
+	// Append the values in the order of prefence, i.e, more specific types
+	// should be first.
 	types = append(types, new(stringValue))
 	types = append(types, new(intValue))
 	types = append(types, new(floatValue))
+	types = append(types, new(varValue))
 	return types
 }

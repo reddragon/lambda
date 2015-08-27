@@ -111,17 +111,19 @@ func TeststringValue(t *testing.T) {
 }
 
 func TestTypeInfer(t *testing.T) {
-	v, e := getValue("1")
+	env := new(LangEnv)
+	env.Init()
+	v, e := getValue(env, "1")
 	if v == nil || v.getValueType() != intType || e != nil {
 		t.Errorf("Could not correctly getValue(1)")
 	}
 
-	v, e = getValue("1.2")
+	v, e = getValue(env, "1.2")
 	if v == nil || v.getValueType() != floatType || e != nil {
 		t.Errorf("Could not correctly getValue(1)")
 	}
 
-	v, e = getValue("'xyz'")
+	v, e = getValue(env, "'xyz'")
 	if v == nil || v.getValueType() != stringType || e != nil {
 		t.Errorf("Could not correctly getValue(1)")
 	}
