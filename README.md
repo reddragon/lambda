@@ -1,4 +1,6 @@
 # eclisp
+<img src="https://travis-ci.org/reddragon/eclisp.svg?branch=master"/>
+
 This is a WIP!
 
 A Lisp dialect written in Golang, which will hopefully 'eclipse' other Lisp dialects :) 
