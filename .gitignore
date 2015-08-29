@@ -1,2 +1,3 @@
 eclisp
 *.sw*
+*.framework
