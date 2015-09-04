@@ -8,6 +8,12 @@ type LangEnv struct {
 	varMap map[string]Value
 }
 
+func NewEnv() *LangEnv {
+	env := new(LangEnv)
+	env.Init()
+	return env
+}
+
 // Initialize the environment
 func (e *LangEnv) Init() {
 	// e.opMap = make(map[string]*Operator)

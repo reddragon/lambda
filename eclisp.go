@@ -21,8 +21,7 @@ func process(env *l.LangEnv, line string) {
 
 func main() {
 	// Setup the language environment
-	env := new(l.LangEnv)
-	env.Init()
+	env := l.NewEnv()
 
 	prompt := "eclisp> "
 	scanner := uniline.DefaultScanner()
