@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"flag"
 	"fmt"
+	"os"
 	l "github.com/reddragon/eclisp/lang"
 	"github.com/tiborvass/uniline"
 )
@@ -19,7 +23,7 @@ func process(env *l.LangEnv, line string) {
 	}
 }
 
-func main() {
+func initREPL() {
 	// Setup the language environment
 	env := l.NewEnv()
 
@@ -38,5 +42,36 @@ func main() {
 		panic(err)
 	} else {
 		fmt.Println("Goodbye!")
+	}
+}
+
+func processScriptFile(scriptFilePath string) {
+	file, err := os.Open(scriptFilePath)
+  if err != nil {
+    panic(err)
+  }
+  defer file.Close()
+
+  var concBuf bytes.Buffer
+  scanner := bufio.NewScanner(file)
+  for scanner.Scan() {
+		concBuf.WriteString(scanner.Text())
+		concBuf.WriteString(" ")
+  }
+
+	if scanner.Err() != nil {
+		panic(scanner.Err())
+	}
+	process(l.NewEnv(), concBuf.String())
+}
+
+func main() {
+	var scriptFile = flag.String("f", "", "path of the file to read from")
+	flag.Parse()
+
+	if len(*scriptFile) > 0 {
+		processScriptFile(*scriptFile)
+	} else {
+		initREPL();
 	}
 }
