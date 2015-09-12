@@ -60,7 +60,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   add,
+			symbol:      add,
 			minArgCount: 2,
 			maxArgCount: 100,
 			handler: func(env *LangEnv, operands []Atom) Atom {
@@ -108,7 +108,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   sub,
+			symbol:      sub,
 			minArgCount: 2,
 			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
@@ -166,7 +166,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   mul,
+			symbol:      mul,
 			minArgCount: 2,
 			maxArgCount: 100,
 			handler: func(env *LangEnv, operands []Atom) Atom {
@@ -214,7 +214,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   div,
+			symbol:      div,
 			minArgCount: 2,
 			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
@@ -280,7 +280,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   def,
+			symbol:      def,
 			minArgCount: 2,
 			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
@@ -313,7 +313,7 @@ func builtinOperators() map[string]*Operator {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:   eq,
+			symbol:      eq,
 			minArgCount: 2,
 			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {

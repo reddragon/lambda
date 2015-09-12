@@ -1,10 +1,10 @@
 package lang
 
 type Operator struct {
-	symbol   string
+	symbol      string
 	minArgCount int
 	maxArgCount int
-	handler  (func(*LangEnv, []Atom) Atom)
+	handler     (func(*LangEnv, []Atom) Atom)
 }
 
 const (

@@ -16,7 +16,7 @@ const (
 	intType    = "intType"
 	floatType  = "floatType"
 	varType    = "varType"
-	boolType	 = "boolType"
+	boolType   = "boolType"
 )
 
 type Value interface {

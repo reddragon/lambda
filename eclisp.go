@@ -5,9 +5,9 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"os"
 	l "github.com/reddragon/eclisp/lang"
 	"github.com/tiborvass/uniline"
+	"os"
 )
 
 func process(env *l.LangEnv, line string) {
@@ -47,17 +47,17 @@ func initREPL() {
 
 func processScriptFile(scriptFilePath string) {
 	file, err := os.Open(scriptFilePath)
-  if err != nil {
-    panic(err)
-  }
-  defer file.Close()
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
 
-  var concBuf bytes.Buffer
-  scanner := bufio.NewScanner(file)
-  for scanner.Scan() {
+	var concBuf bytes.Buffer
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
 		concBuf.WriteString(scanner.Text())
 		concBuf.WriteString(" ")
-  }
+	}
 
 	if scanner.Err() != nil {
 		panic(scanner.Err())
@@ -72,6 +72,6 @@ func main() {
 	if len(*scriptFile) > 0 {
 		processScriptFile(*scriptFile)
 	} else {
-		initREPL();
+		initREPL()
 	}
 }
