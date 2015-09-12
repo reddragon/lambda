@@ -61,7 +61,8 @@ func builtinOperators() map[string]*Operator {
 	addOperator(opMap,
 		&Operator{
 			symbol:   add,
-			argCount: 2,
+			minArgCount: 2,
+			maxArgCount: 100,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
@@ -108,7 +109,8 @@ func builtinOperators() map[string]*Operator {
 	addOperator(opMap,
 		&Operator{
 			symbol:   sub,
-			argCount: 2,
+			minArgCount: 2,
+			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
@@ -165,7 +167,8 @@ func builtinOperators() map[string]*Operator {
 	addOperator(opMap,
 		&Operator{
 			symbol:   mul,
-			argCount: 2,
+			minArgCount: 2,
+			maxArgCount: 100,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
@@ -178,39 +181,29 @@ func builtinOperators() map[string]*Operator {
 				switch finalType {
 				case intType:
 					var finalVal intValue
-					var val1, val2 *intValue
 					finalVal.value = 1
-
-					var ok bool
-					val1, ok = operands[0].Val.(*intValue)
-					if !ok {
-						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
+					for _, o := range operands {
+						v, ok := o.Val.(*intValue)
+						if ok {
+							finalVal.value = finalVal.value * v.value
+						} else {
+							fmt.Errorf("Error while converting %s to intValue\n", o.Val.Str())
+						}
 					}
-
-					val2, ok = operands[1].Val.(*intValue)
-					if !ok {
-						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
-					}
-					finalVal.value = val1.value * val2.value
 					retVal.Val = finalVal
 					break
 
 				case floatType:
 					var finalVal floatValue
-					var val1, val2 *floatValue
-					finalVal.value = 0
-
-					var ok bool
-					val1, ok = operands[0].Val.(*floatValue)
-					if !ok {
-						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
+					finalVal.value = 1
+					for _, o := range operands {
+						v, ok := o.Val.(*floatValue)
+						if ok {
+							finalVal.value = finalVal.value * v.value
+						} else {
+							fmt.Errorf("Error while converting %s to floatValue\n", o.Val.Str())
+						}
 					}
-
-					val2, ok = operands[1].Val.(*floatValue)
-					if !ok {
-						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
-					}
-					finalVal.value = val1.value * val2.value
 					retVal.Val = finalVal
 					break
 				}
@@ -222,7 +215,8 @@ func builtinOperators() map[string]*Operator {
 	addOperator(opMap,
 		&Operator{
 			symbol:   div,
-			argCount: 2,
+			minArgCount: 2,
+			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
@@ -287,7 +281,8 @@ func builtinOperators() map[string]*Operator {
 	addOperator(opMap,
 		&Operator{
 			symbol:   def,
-			argCount: 2,
+			minArgCount: 2,
+			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				vtype1 := operands[0].Val.getValueType()
@@ -319,7 +314,8 @@ func builtinOperators() map[string]*Operator {
 	addOperator(opMap,
 		&Operator{
 			symbol:   eq,
-			argCount: 2,
+			minArgCount: 2,
+			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				vtype1 := operands[0].Val.getValueType()
@@ -330,7 +326,7 @@ func builtinOperators() map[string]*Operator {
 					return retVal
 				}
 
-				retVal.Val = newBoolValue(operands[0].Val.Str() == operands[1].Val.Str()) 
+				retVal.Val = newBoolValue(operands[0].Val.Str() == operands[1].Val.Str())
 				return retVal
 			},
 		},

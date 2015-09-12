@@ -2,7 +2,8 @@ package lang
 
 type Operator struct {
 	symbol   string
-	argCount int
+	minArgCount int
+	maxArgCount int
 	handler  (func(*LangEnv, []Atom) Atom)
 }
 

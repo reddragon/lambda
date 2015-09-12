@@ -55,11 +55,26 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 		return retVal
 	}
 
-	if len(node.children)-1 != operator.argCount {
-		retVal.Err = errors.New(
-			fmt.Sprintf("Received %d arguments for operator %s, expected: %d",
-				len(node.children)-1, symbol, operator.argCount))
-		return retVal
+	if operator.minArgCount == operator.maxArgCount {
+		argCount := operator.minArgCount
+		if len(node.children)-1 != argCount {
+			retVal.Err = errors.New(
+				fmt.Sprintf("Received %d arguments for operator %s, expected: %d",
+					len(node.children)-1, symbol, argCount))
+			return retVal
+		}
+	} else {
+		if len(node.children)-1 < operator.minArgCount {
+			retVal.Err = errors.New(
+				fmt.Sprintf("Received %d arguments for operator %s, minimum expected arguments: %d",
+					len(node.children)-1, symbol, operator.minArgCount))
+			return retVal
+		} else if len(node.children)-1 > operator.maxArgCount {
+			retVal.Err = errors.New(
+				fmt.Sprintf("Received %d arguments for operator %s, maximum expected arguments: %d",
+					len(node.children)-1, symbol, operator.maxArgCount))
+			return retVal
+		}
 	}
 
 	operands := make([]Atom, 0)
