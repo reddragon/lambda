@@ -315,6 +315,26 @@ func builtinOperators() map[string]*Operator {
 			},
 		},
 	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:   eq,
+			argCount: 2,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				vtype1 := operands[0].Val.getValueType()
+				vtype2 := operands[1].Val.getValueType()
+
+				if vtype1 != vtype2 {
+					retVal.Err = errors.New(fmt.Sprintf("Cannot use %s operator for two different types %s and %s", eq, vtype1, vtype2))
+					return retVal
+				}
+
+				retVal.Val = newBoolValue(operands[0].Val.Str() == operands[1].Val.Str()) 
+				return retVal
+			},
+		},
+	)
 	return opMap
 }
 

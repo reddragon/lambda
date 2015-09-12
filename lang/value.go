@@ -239,9 +239,9 @@ func (v boolValue) ofType(targetValue string) bool {
 
 func (v boolValue) Str() string {
 	if v.value == true {
-		return "True"
+		return "true"
 	} else {
-		return "False"
+		return "false"
 	}
 }
 
@@ -252,5 +252,11 @@ func (v boolValue) newValue(str string) Value {
 	} else {
 		val.value = false
 	}
+	return val
+}
+
+func newBoolValue(b bool) Value {
+	val := new(boolValue)
+	val.value = b
 	return val
 }

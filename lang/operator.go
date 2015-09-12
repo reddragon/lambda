@@ -13,4 +13,5 @@ const (
 	mul string = "*"
 	div string = "/"
 	def string = "defvar"
+	eq  string = "eq"
 )
