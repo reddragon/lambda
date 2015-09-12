@@ -325,6 +325,7 @@ func builtinTypes() []Value {
 	types = append(types, new(stringValue))
 	types = append(types, new(intValue))
 	types = append(types, new(floatValue))
+	types = append(types, new(boolValue))
 	types = append(types, new(varValue))
 	return types
 }

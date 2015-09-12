@@ -127,4 +127,14 @@ func TestTypeInfer(t *testing.T) {
 	if v == nil || v.getValueType() != stringType || e != nil {
 		t.Errorf("Could not correctly getValue(1)")
 	}
+
+	v, e = getValue(env, "true")
+	if v == nil || v.getValueType() != boolType || e != nil {
+		t.Errorf("Could not correctly getValue(1)")
+	}
+
+	v, e = getValue(env, "false")
+	if v == nil || v.getValueType() != boolType || e != nil {
+		t.Errorf("Could not correctly getValue(1)")
+	}
 }

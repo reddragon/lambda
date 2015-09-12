@@ -16,6 +16,7 @@ const (
 	intType    = "intType"
 	floatType  = "floatType"
 	varType    = "varType"
+	boolType	 = "boolType"
 )
 
 type Value interface {
@@ -214,5 +215,42 @@ func (v varValue) Str() string {
 func (v varValue) newValue(str string) Value {
 	val := new(varValue)
 	val.value = str
+	return val
+}
+
+type boolValue struct {
+	value bool
+}
+
+func (v boolValue) getValueType() valueType {
+	return boolType
+}
+
+func (v boolValue) to(targetType valueType) (Value, error) {
+	return nil, typeConvError(v.getValueType(), targetType)
+}
+
+func (v boolValue) ofType(targetValue string) bool {
+	if targetValue == "true" || targetValue == "false" {
+		return true
+	}
+	return false
+}
+
+func (v boolValue) Str() string {
+	if v.value == true {
+		return "True"
+	} else {
+		return "False"
+	}
+}
+
+func (v boolValue) newValue(str string) Value {
+	val := new(boolValue)
+	if str == "true" {
+		val.value = true
+	} else {
+		val.value = false
+	}
 	return val
 }
