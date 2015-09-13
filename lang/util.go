@@ -31,3 +31,53 @@ func pop(tokens []string) (string, []string) {
 	}
 	return tokens[0], tokens[1:]
 }
+
+// Algorithm:
+// 1. We get the type -> count mapping.
+// 2. If there is only one type, there is nothing to do.
+// 3. If there are multiple, pick the one with the highest precedence.
+// 4. Try and cast all operand values to that type. Error out if any of them
+//    resists. Because, resistance is futile.
+func typeCoerce(operatorName string, operands *[]Atom, typePrecendenceMap map[valueType]int) (valueType, error) {
+	var err error
+	var typesCountMap map[valueType]int
+	allowedTypes := make([]valueType, len(typePrecendenceMap))
+	for vtype, _ := range typePrecendenceMap {
+		allowedTypes = append(allowedTypes, vtype)
+	}
+
+	typesCountMap, err = checkArgTypes(operatorName, operands, allowedTypes)
+	if err != nil {
+		return "", err
+	}
+
+	if len(typesCountMap) == 1 {
+		valType := (*operands)[0].Val.getValueType()
+		return valType, nil
+	}
+
+	var finalType valueType
+	finalTypePrecedence := -1
+	for t, c := range typesCountMap {
+		if c <= 0 {
+			continue
+		}
+		precedence := typePrecendenceMap[t]
+		if precedence > finalTypePrecedence {
+			finalType = t
+			finalTypePrecedence = precedence
+		}
+	}
+
+	for i := 0; i < len(*operands); i++ {
+		if (*operands)[i].Val.getValueType() != finalType {
+			var err error
+			(*operands)[i].Val, err = (*operands)[i].Val.to(finalType)
+
+			if err != nil {
+				return "", err
+			}
+		}
+	}
+	return finalType, nil
+}
