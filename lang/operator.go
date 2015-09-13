@@ -15,4 +15,8 @@ const (
 	div string = "/"
 	def string = "defvar"
 	eq  string = "eq"
+	gt  string = ">"
+	geq string = ">="
+	lt  string = "<"
+	leq string = "<="
 )

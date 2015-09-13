@@ -15,10 +15,15 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 // 3. If there are multiple, pick the one with the highest precedence.
 // 4. Try and cast all operand values to that type. Error out if any of them
 //    resists. Because, resistance is futile.
-func typeCoerce(operatorName string, operands *[]Atom, expectedArgs int, typePrecendenceMap map[valueType]int) (valueType, error) {
+func typeCoerce(operatorName string, operands *[]Atom, typePrecendenceMap map[valueType]int) (valueType, error) {
 	var err error
 	var typesCountMap map[valueType]int
-	typesCountMap, err = checkArgTypes(operatorName, operands, []valueType{intType, floatType})
+	allowedTypes := make([]valueType, len(typePrecendenceMap))
+	for vtype, _ := range typePrecendenceMap {
+		allowedTypes = append(allowedTypes, vtype)
+	}
+
+	typesCountMap, err = checkArgTypes(operatorName, operands, allowedTypes)
 	if err != nil {
 		return "", err
 	}
@@ -57,6 +62,7 @@ func typeCoerce(operatorName string, operands *[]Atom, expectedArgs int, typePre
 // This methods returns all the builtin operators to the environment
 func builtinOperators() map[string]*Operator {
 	opMap := make(map[string]*Operator)
+	numValPrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 
 	addOperator(opMap,
 		&Operator{
@@ -65,9 +71,8 @@ func builtinOperators() map[string]*Operator {
 			maxArgCount: 100,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
-				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
-				finalType, retVal.Err = typeCoerce(add, &operands, 2, typePrecedenceMap)
+				finalType, retVal.Err = typeCoerce(add, &operands, numValPrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
 				}
@@ -113,9 +118,8 @@ func builtinOperators() map[string]*Operator {
 			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
-				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
-				finalType, retVal.Err = typeCoerce(sub, &operands, 2, typePrecedenceMap)
+				finalType, retVal.Err = typeCoerce(sub, &operands, numValPrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
 				}
@@ -171,9 +175,8 @@ func builtinOperators() map[string]*Operator {
 			maxArgCount: 100,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
-				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
-				finalType, retVal.Err = typeCoerce(mul, &operands, 2, typePrecedenceMap)
+				finalType, retVal.Err = typeCoerce(mul, &operands, numValPrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
 				}
@@ -219,9 +222,8 @@ func builtinOperators() map[string]*Operator {
 			maxArgCount: 2,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
-				typePrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 				var finalType valueType
-				finalType, retVal.Err = typeCoerce(div, &operands, 2, typePrecedenceMap)
+				finalType, retVal.Err = typeCoerce(div, &operands, numValPrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
 				}
@@ -327,6 +329,39 @@ func builtinOperators() map[string]*Operator {
 				}
 
 				retVal.Val = newBoolValue(operands[0].Val.Str() == operands[1].Val.Str())
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:      gt,
+			minArgCount: 2,
+			maxArgCount: 2,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				var finalType valueType
+				finalType, retVal.Err = typeCoerce(gt, &operands, numValPrecedenceMap)
+				if retVal.Err != nil {
+					return retVal
+				}
+
+				switch finalType {
+				case intType:
+					var val1, val2 *intValue
+					val1, _  = operands[0].Val.(*intValue)
+					val2, _ = operands[1].Val.(*intValue)
+					retVal.Val = newBoolValue(val1.value > val2.value)
+					break
+
+				case floatType:
+					var val1, val2 *floatValue
+					val1, _  = operands[0].Val.(*floatValue)
+					val2, _ = operands[1].Val.(*floatValue)
+					retVal.Val = newBoolValue(val1.value > val2.value)
+					break
+				}
 				return retVal
 			},
 		},
