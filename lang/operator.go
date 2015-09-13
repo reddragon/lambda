@@ -1,8 +1,10 @@
 package lang
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Operator struct {
@@ -24,6 +26,8 @@ const (
 	geq string = ">="
 	lt  string = "<"
 	leq string = "<="
+	and string = "and"
+	or  string = "or"
 )
 
 func addOperator(opMap map[string]*Operator, op *Operator) {
@@ -42,7 +46,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				var finalType valueType
-				finalType, retVal.Err = typeCoerce(add, &operands, numValPrecedenceMap)
+				finalType, retVal.Err = chainedTypeCoerce(add, &operands, []map[valueType]int{numValPrecedenceMap, strValPrecedenceMap})
 				if retVal.Err != nil {
 					return retVal
 				}
@@ -74,6 +78,19 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 						}
 					}
 					retVal.Val = finalVal
+					break
+
+				case stringType:
+					var buffer bytes.Buffer
+					var finalVal stringValue
+					for _, o := range operands {
+						v, ok := o.Val.(*stringValue)
+						if ok {
+							buffer.WriteString(strings.Split(v.value, "\"")[1])
+						}
+					}
+
+					retVal.Val = finalVal.newValue(fmt.Sprintf("\"%s\"", buffer.String()))
 					break
 				}
 				return retVal
