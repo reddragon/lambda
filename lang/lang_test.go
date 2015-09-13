@@ -29,8 +29,11 @@ func TestBasicLang(t *testing.T) {
 	env.Init()
 
 	saneQueryTest("(+ 1 2)", "3", t, env)
+	saneQueryTest("(+ 1 2 3 4 5)", "15", t, env)
+	saneQueryTest("(+ \"Hello\" \",\" \"World!\")", "\"Hello,World!\"", t, env)
 	saneQueryTest("(- 1 2)", "-1", t, env)
 	saneQueryTest("(* 1 2)", "2", t, env)
+	saneQueryTest("(* 1 2 3 4 5)", "120", t, env)
 	saneQueryTest("(/ 1 2)", "0", t, env)
 
 	saneQueryTest("(+ 1.1 2.1)", "3.2", t, env)
@@ -42,6 +45,20 @@ func TestBasicLang(t *testing.T) {
 	saneQueryTest("(+ x 2.0)", "4", t, env)
 	saneQueryTest("(defvar y 1.9)", "1.9", t, env)
 	saneQueryTest("(* x y)", "3.8", t, env)
+
+	saneQueryTest("(> 3 2)", "true", t, env)
+	saneQueryTest("(> 2 3)", "false", t, env)
+	saneQueryTest("(< 3 2)", "false", t, env)
+	saneQueryTest("(< 2 3)", "true", t, env)
+	saneQueryTest("(>= 3 2)", "true", t, env)
+	saneQueryTest("(>= 3 3)", "true", t, env)
+	saneQueryTest("(<= 3 3)", "true", t, env)
+	saneQueryTest("(<= 3 2)", "false", t, env)
+
+	saneQueryTest("(> \"a\" \"b\")", "false", t, env)
+	saneQueryTest("(> \"b\" \"a\")", "true", t, env)
+	saneQueryTest("(< \"a\" \"b\")", "true", t, env)
+	saneQueryTest("(< \"b\" \"a\")", "false", t, env)
 
 	malformedQueryTest(")(", t, env)
 	malformedQueryTest(")", t, env)
