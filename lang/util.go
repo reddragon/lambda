@@ -81,3 +81,17 @@ func typeCoerce(operatorName string, operands *[]Atom, typePrecendenceMap map[va
 	}
 	return finalType, nil
 }
+
+// This is used when a group of value types can be used with the operator.
+// This method processes the operands in order of the precendence maps.
+func chainedTypeCoerce(operatorName string, operands *[]Atom, typePrecendenceMapList []map[valueType]int) (valueType, error) {
+	var vtype valueType
+	var err error
+	for _, pMap := range typePrecendenceMapList {
+		vtype, err = typeCoerce(operatorName, operands, pMap)
+		if err == nil {
+			return vtype, nil
+		}
+	}
+	return "", err
+}

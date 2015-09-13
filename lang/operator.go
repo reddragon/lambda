@@ -32,6 +32,7 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 
 func addBuiltinOperators(opMap map[string]*Operator) {
 	numValPrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
+	strValPrecedenceMap := map[valueType]int{stringType: 1}
 
 	addOperator(opMap,
 		&Operator{
@@ -328,6 +329,46 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					var val1, val2 *floatValue
 					val1, _  = operands[0].Val.(*floatValue)
 					val2, _ = operands[1].Val.(*floatValue)
+					retVal.Val = newBoolValue(val1.value > val2.value)
+					break
+				}
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:      gt,
+			minArgCount: 2,
+			maxArgCount: 2,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				var finalType valueType
+				finalType, retVal.Err = chainedTypeCoerce(gt, &operands, []map[valueType]int{numValPrecedenceMap, strValPrecedenceMap})
+				if retVal.Err != nil {
+					return retVal
+				}
+
+				switch finalType {
+				case intType:
+					var val1, val2 *intValue
+					val1, _  = operands[0].Val.(*intValue)
+					val2, _ = operands[1].Val.(*intValue)
+					retVal.Val = newBoolValue(val1.value > val2.value)
+					break
+
+				case floatType:
+					var val1, val2 *floatValue
+					val1, _  = operands[0].Val.(*floatValue)
+					val2, _ = operands[1].Val.(*floatValue)
+					retVal.Val = newBoolValue(val1.value > val2.value)
+					break
+
+				case stringType:
+					var val1, val2 *stringValue
+					val1, _  = operands[0].Val.(*stringValue)
+					val2, _ = operands[1].Val.(*stringValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
 				}
