@@ -45,6 +45,11 @@ func TestBasicLang(t *testing.T) {
 	saneQueryTest("(+ x 2.0)", "4", t, env)
 	saneQueryTest("(defvar y 1.9)", "1.9", t, env)
 	saneQueryTest("(* x y)", "3.8", t, env)
+	saneQueryTest("(defvar i 5.0)", "5", t, env)
+	saneQueryTest("(defvar i 6.0)", "6", t, env)
+	malformedQueryTest("(+ i j)", t, env)
+	saneQueryTest("(defvar j 3.1)", "3.1", t, env)
+	saneQueryTest("(+ i j)", "9.1", t, env)
 
 	saneQueryTest("(> 3 2)", "true", t, env)
 	saneQueryTest("(> 2 3)", "false", t, env)

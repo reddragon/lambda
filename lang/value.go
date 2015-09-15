@@ -33,9 +33,7 @@ func getVarValue(env *LangEnv, varValue Value) (Value, error) {
 		if val != nil {
 			return val, nil
 		}
-		// Note, we don't return an error here. We will let it be handled in
-		// the handler.
-		return varValue, nil
+		return nil, errors.New(fmt.Sprintf("Undefined variable: %s", varValue.Str()))
 	}
 	return nil, errors.New(fmt.Sprintf("Error while resolving variable."))
 }
