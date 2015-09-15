@@ -8,11 +8,11 @@ import (
 )
 
 type Operator struct {
-	symbol      string
-	minArgCount int
-	maxArgCount int
+	symbol           string
+	minArgCount      int
+	maxArgCount      int
 	doNotResolveVars bool
-	handler     (func(*LangEnv, []Atom) Atom)
+	handler          (func(*LangEnv, []Atom) Atom)
 }
 
 const (
@@ -270,9 +270,9 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 	addOperator(opMap,
 		&Operator{
-			symbol:      def,
-			minArgCount: 2,
-			maxArgCount: 2,
+			symbol:           def,
+			minArgCount:      2,
+			maxArgCount:      2,
 			doNotResolveVars: true,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
@@ -339,21 +339,21 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				switch finalType {
 				case intType:
 					var val1, val2 *intValue
-					val1, _  = operands[0].Val.(*intValue)
+					val1, _ = operands[0].Val.(*intValue)
 					val2, _ = operands[1].Val.(*intValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
 
 				case floatType:
 					var val1, val2 *floatValue
-					val1, _  = operands[0].Val.(*floatValue)
+					val1, _ = operands[0].Val.(*floatValue)
 					val2, _ = operands[1].Val.(*floatValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
 
 				case stringType:
 					var val1, val2 *stringValue
-					val1, _  = operands[0].Val.(*stringValue)
+					val1, _ = operands[0].Val.(*stringValue)
 					val2, _ = operands[1].Val.(*stringValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
@@ -379,21 +379,21 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				switch finalType {
 				case intType:
 					var val1, val2 *intValue
-					val1, _  = operands[0].Val.(*intValue)
+					val1, _ = operands[0].Val.(*intValue)
 					val2, _ = operands[1].Val.(*intValue)
 					retVal.Val = newBoolValue(val1.value >= val2.value)
 					break
 
 				case floatType:
 					var val1, val2 *floatValue
-					val1, _  = operands[0].Val.(*floatValue)
+					val1, _ = operands[0].Val.(*floatValue)
 					val2, _ = operands[1].Val.(*floatValue)
 					retVal.Val = newBoolValue(val1.value >= val2.value)
 					break
 
 				case stringType:
 					var val1, val2 *stringValue
-					val1, _  = operands[0].Val.(*stringValue)
+					val1, _ = operands[0].Val.(*stringValue)
 					val2, _ = operands[1].Val.(*stringValue)
 					retVal.Val = newBoolValue(val1.value >= val2.value)
 					break
@@ -419,21 +419,21 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				switch finalType {
 				case intType:
 					var val1, val2 *intValue
-					val1, _  = operands[0].Val.(*intValue)
+					val1, _ = operands[0].Val.(*intValue)
 					val2, _ = operands[1].Val.(*intValue)
 					retVal.Val = newBoolValue(val1.value < val2.value)
 					break
 
 				case floatType:
 					var val1, val2 *floatValue
-					val1, _  = operands[0].Val.(*floatValue)
+					val1, _ = operands[0].Val.(*floatValue)
 					val2, _ = operands[1].Val.(*floatValue)
 					retVal.Val = newBoolValue(val1.value < val2.value)
 					break
 
 				case stringType:
 					var val1, val2 *stringValue
-					val1, _  = operands[0].Val.(*stringValue)
+					val1, _ = operands[0].Val.(*stringValue)
 					val2, _ = operands[1].Val.(*stringValue)
 					retVal.Val = newBoolValue(val1.value < val2.value)
 					break
@@ -459,21 +459,21 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				switch finalType {
 				case intType:
 					var val1, val2 *intValue
-					val1, _  = operands[0].Val.(*intValue)
+					val1, _ = operands[0].Val.(*intValue)
 					val2, _ = operands[1].Val.(*intValue)
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
 
 				case floatType:
 					var val1, val2 *floatValue
-					val1, _  = operands[0].Val.(*floatValue)
+					val1, _ = operands[0].Val.(*floatValue)
 					val2, _ = operands[1].Val.(*floatValue)
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
 
 				case stringType:
 					var val1, val2 *stringValue
-					val1, _  = operands[0].Val.(*stringValue)
+					val1, _ = operands[0].Val.(*stringValue)
 					val2, _ = operands[1].Val.(*stringValue)
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
