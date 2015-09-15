@@ -40,6 +40,8 @@ func getValue(env *LangEnv, token string) (Value, error) {
 				val := env.varMap[token]
 				if val != nil {
 					return val, nil
+				} else {
+					return nil, errors.New(fmt.Sprintf("Undefined variable: %s", token))
 				}
 			}
 			return t.newValue(token), nil

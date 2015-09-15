@@ -37,7 +37,7 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 	if node.isValue {
 		value, err := getValue(env, node.value)
 		if err != nil {
-			retVal.Err = errStr("value", node.value)
+			retVal.Err = errors.New(fmt.Sprintf("%s %s", errStr("value", node.value), err))
 		} else {
 			retVal.Val = value
 		}
