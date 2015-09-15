@@ -11,6 +11,7 @@ type Operator struct {
 	symbol      string
 	minArgCount int
 	maxArgCount int
+	doNotResolveVars bool
 	handler     (func(*LangEnv, []Atom) Atom)
 }
 
@@ -272,6 +273,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			symbol:      def,
 			minArgCount: 2,
 			maxArgCount: 2,
+			doNotResolveVars: true,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				vtype1 := operands[0].Val.getValueType()

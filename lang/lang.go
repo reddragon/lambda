@@ -83,6 +83,12 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 		if v.Err != nil {
 			return v
 		}
+		if !operator.doNotResolveVars && v.Val.getValueType() == varType {
+			v.Val, v.Err = getVarValue(env, v.Val)
+			if v.Err != nil {
+				return v
+			}
+		}
 		operands = append(operands, v)
 	}
 	v := operator.handler(env, operands)

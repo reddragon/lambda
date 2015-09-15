@@ -27,27 +27,30 @@ type Value interface {
 	newValue(string) Value
 }
 
+func getVarValue(env *LangEnv, varValue Value) (Value, error) {
+	if varValue != nil && varValue.getValueType() == varType {
+		val := env.varMap[varValue.Str()]
+		if val != nil {
+			return val, nil
+		}
+		// Note, we don't return an error here. We will let it be handled in
+		// the handler.
+		return varValue, nil
+	}
+	return nil, errors.New(fmt.Sprintf("Error while resolving variable."))
+}
+
 // Algorithm
 // 1. Go through all the value types, in order.
 // 2. Pick the highest value type that complies.
 // 3. Return that value type.
 func getValue(env *LangEnv, token string) (Value, error) {
-	// TODO Use env types
 	types := builtinTypes()
 	for _, t := range types {
 		if t.ofType(token) {
-			if t.getValueType() == varType {
-				val := env.varMap[token]
-				if val != nil {
-					return val, nil
-				} else {
-					return nil, errors.New(fmt.Sprintf("Undefined variable: %s", token))
-				}
-			}
 			return t.newValue(token), nil
 		}
 	}
-
 	return nil, errors.New(fmt.Sprintf("Could not get type for token: %s", token))
 }
 
