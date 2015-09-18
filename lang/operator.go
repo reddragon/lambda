@@ -57,7 +57,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					var finalVal intValue
 					finalVal.value = 0
 					for _, o := range operands {
-						v, ok := o.Val.(*intValue)
+						v, ok := o.Val.(intValue)
 						if ok {
 							finalVal.value = finalVal.value + v.value
 						} else {
@@ -71,7 +71,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					var finalVal floatValue
 					finalVal.value = 0
 					for _, o := range operands {
-						v, ok := o.Val.(*floatValue)
+						v, ok := o.Val.(floatValue)
 						if ok {
 							finalVal.value = finalVal.value + v.value
 						} else {
@@ -85,7 +85,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					var buffer bytes.Buffer
 					var finalVal stringValue
 					for _, o := range operands {
-						v, ok := o.Val.(*stringValue)
+						v, ok := o.Val.(stringValue)
 						if ok {
 							buffer.WriteString(strings.Split(v.value, "\"")[1])
 						}
@@ -107,6 +107,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				var finalType valueType
+
 				finalType, retVal.Err = typeCoerce(sub, &operands, numValPrecedenceMap)
 				if retVal.Err != nil {
 					return retVal
@@ -115,16 +116,16 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				switch finalType {
 				case intType:
 					var finalVal intValue
-					var val1, val2 *intValue
+					var val1, val2 intValue
 					finalVal.value = 0
 
 					var ok bool
-					val1, ok = operands[0].Val.(*intValue)
+					val1, ok = operands[0].Val.(intValue)
 					if !ok {
 						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
 					}
 
-					val2, ok = operands[1].Val.(*intValue)
+					val2, ok = operands[1].Val.(intValue)
 					if !ok {
 						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
 					}
@@ -134,19 +135,22 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				case floatType:
 					var finalVal floatValue
-					var val1, val2 *floatValue
+					var val1, val2 floatValue
 					finalVal.value = 0
 
 					var ok bool
-					val1, ok = operands[0].Val.(*floatValue)
+					val1, ok = operands[0].Val.(floatValue)
 					if !ok {
 						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
 					}
 
-					val2, ok = operands[1].Val.(*floatValue)
+					val2, ok = operands[1].Val.(floatValue)
 					if !ok {
+						fmt.Printf("It was not ok!, type: %s, rawtype: %T\n",
+								operands[1].Val.getValueType(), operands[1].Val)
 						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
 					}
+
 					finalVal.value = val1.value - val2.value
 					retVal.Val = finalVal
 					break
@@ -174,7 +178,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					var finalVal intValue
 					finalVal.value = 1
 					for _, o := range operands {
-						v, ok := o.Val.(*intValue)
+						v, ok := o.Val.(intValue)
 						if ok {
 							finalVal.value = finalVal.value * v.value
 						} else {
@@ -188,7 +192,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					var finalVal floatValue
 					finalVal.value = 1
 					for _, o := range operands {
-						v, ok := o.Val.(*floatValue)
+						v, ok := o.Val.(floatValue)
 						if ok {
 							finalVal.value = finalVal.value * v.value
 						} else {
@@ -219,16 +223,16 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				switch finalType {
 				case intType:
 					var finalVal intValue
-					var val1, val2 *intValue
+					var val1, val2 intValue
 					finalVal.value = 1
 
 					var ok bool
-					val1, ok = operands[0].Val.(*intValue)
+					val1, ok = operands[0].Val.(intValue)
 					if !ok {
 						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
 					}
 
-					val2, ok = operands[1].Val.(*intValue)
+					val2, ok = operands[1].Val.(intValue)
 					if !ok {
 						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
 					}
@@ -242,18 +246,18 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				case floatType:
 					var finalVal floatValue
-					var val1, val2 *floatValue
+					var val1, val2 floatValue
 					finalVal.value = 0
 
 					var ok bool
-					val1, ok = operands[0].Val.(*floatValue)
+					val1, ok = operands[0].Val.(floatValue)
 					if !ok {
-						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
+						fmt.Printf("Error while converting %s to floatValue\n", operands[0].Val.Str())
 					}
 
-					val2, ok = operands[1].Val.(*floatValue)
+					val2, ok = operands[1].Val.(floatValue)
 					if !ok {
-						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
+						fmt.Printf("Error while converting %s to floatValue\n", operands[1].Val.Str())
 					}
 					if val2.value != 0 {
 						finalVal.value = val1.value / val2.value
@@ -338,23 +342,23 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				switch finalType {
 				case intType:
-					var val1, val2 *intValue
-					val1, _ = operands[0].Val.(*intValue)
-					val2, _ = operands[1].Val.(*intValue)
+					var val1, val2 intValue
+					val1, _ = operands[0].Val.(intValue)
+					val2, _ = operands[1].Val.(intValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
 
 				case floatType:
-					var val1, val2 *floatValue
-					val1, _ = operands[0].Val.(*floatValue)
-					val2, _ = operands[1].Val.(*floatValue)
+					var val1, val2 floatValue
+					val1, _ = operands[0].Val.(floatValue)
+					val2, _ = operands[1].Val.(floatValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
 
 				case stringType:
-					var val1, val2 *stringValue
-					val1, _ = operands[0].Val.(*stringValue)
-					val2, _ = operands[1].Val.(*stringValue)
+					var val1, val2 stringValue
+					val1, _ = operands[0].Val.(stringValue)
+					val2, _ = operands[1].Val.(stringValue)
 					retVal.Val = newBoolValue(val1.value > val2.value)
 					break
 				}
@@ -378,23 +382,23 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				switch finalType {
 				case intType:
-					var val1, val2 *intValue
-					val1, _ = operands[0].Val.(*intValue)
-					val2, _ = operands[1].Val.(*intValue)
+					var val1, val2 intValue
+					val1, _ = operands[0].Val.(intValue)
+					val2, _ = operands[1].Val.(intValue)
 					retVal.Val = newBoolValue(val1.value >= val2.value)
 					break
 
 				case floatType:
-					var val1, val2 *floatValue
-					val1, _ = operands[0].Val.(*floatValue)
-					val2, _ = operands[1].Val.(*floatValue)
+					var val1, val2 floatValue
+					val1, _ = operands[0].Val.(floatValue)
+					val2, _ = operands[1].Val.(floatValue)
 					retVal.Val = newBoolValue(val1.value >= val2.value)
 					break
 
 				case stringType:
-					var val1, val2 *stringValue
-					val1, _ = operands[0].Val.(*stringValue)
-					val2, _ = operands[1].Val.(*stringValue)
+					var val1, val2 stringValue
+					val1, _ = operands[0].Val.(stringValue)
+					val2, _ = operands[1].Val.(stringValue)
 					retVal.Val = newBoolValue(val1.value >= val2.value)
 					break
 				}
@@ -418,23 +422,23 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				switch finalType {
 				case intType:
-					var val1, val2 *intValue
-					val1, _ = operands[0].Val.(*intValue)
-					val2, _ = operands[1].Val.(*intValue)
+					var val1, val2 intValue
+					val1, _ = operands[0].Val.(intValue)
+					val2, _ = operands[1].Val.(intValue)
 					retVal.Val = newBoolValue(val1.value < val2.value)
 					break
 
 				case floatType:
-					var val1, val2 *floatValue
-					val1, _ = operands[0].Val.(*floatValue)
-					val2, _ = operands[1].Val.(*floatValue)
+					var val1, val2 floatValue
+					val1, _ = operands[0].Val.(floatValue)
+					val2, _ = operands[1].Val.(floatValue)
 					retVal.Val = newBoolValue(val1.value < val2.value)
 					break
 
 				case stringType:
-					var val1, val2 *stringValue
-					val1, _ = operands[0].Val.(*stringValue)
-					val2, _ = operands[1].Val.(*stringValue)
+					var val1, val2 stringValue
+					val1, _ = operands[0].Val.(stringValue)
+					val2, _ = operands[1].Val.(stringValue)
 					retVal.Val = newBoolValue(val1.value < val2.value)
 					break
 				}
@@ -458,23 +462,23 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				switch finalType {
 				case intType:
-					var val1, val2 *intValue
-					val1, _ = operands[0].Val.(*intValue)
-					val2, _ = operands[1].Val.(*intValue)
+					var val1, val2 intValue
+					val1, _ = operands[0].Val.(intValue)
+					val2, _ = operands[1].Val.(intValue)
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
 
 				case floatType:
-					var val1, val2 *floatValue
-					val1, _ = operands[0].Val.(*floatValue)
-					val2, _ = operands[1].Val.(*floatValue)
+					var val1, val2 floatValue
+					val1, _ = operands[0].Val.(floatValue)
+					val2, _ = operands[1].Val.(floatValue)
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
 
 				case stringType:
-					var val1, val2 *stringValue
-					val1, _ = operands[0].Val.(*stringValue)
-					val2, _ = operands[1].Val.(*stringValue)
+					var val1, val2 stringValue
+					val1, _ = operands[0].Val.(stringValue)
+					val2, _ = operands[1].Val.(stringValue)
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
 				}

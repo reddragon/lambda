@@ -104,7 +104,7 @@ func (v stringValue) ofType(targetValue string) bool {
 }
 
 func (v stringValue) newValue(str string) Value {
-	val := new(stringValue)
+	var val stringValue
 	val.value = str
 	return val
 }
@@ -122,7 +122,7 @@ func (v intValue) to(targetType valueType) (Value, error) {
 	case intType:
 		return v, nil
 	case floatType:
-		val := new(floatValue)
+		var val floatValue
 		val.value = float64(v.value)
 		return val, nil
 	}
@@ -147,7 +147,7 @@ func (v intValue) newValue(str string) Value {
 	if err != nil {
 		return nil
 	}
-	val := new(intValue)
+	var val intValue
 	val.value = intVal
 	return val
 }
@@ -186,7 +186,7 @@ func (v floatValue) newValue(str string) Value {
 	if err != nil {
 		return nil
 	}
-	val := new(floatValue)
+	var val floatValue
 	val.value = floatVal
 	return val
 }
@@ -216,7 +216,7 @@ func (v varValue) Str() string {
 }
 
 func (v varValue) newValue(str string) Value {
-	val := new(varValue)
+	var val varValue
 	val.value = str
 	return val
 }
@@ -249,7 +249,7 @@ func (v boolValue) Str() string {
 }
 
 func (v boolValue) newValue(str string) Value {
-	val := new(boolValue)
+	var val boolValue
 	if str == "true" {
 		val.value = true
 	} else {
@@ -259,7 +259,7 @@ func (v boolValue) newValue(str string) Value {
 }
 
 func newBoolValue(b bool) Value {
-	val := new(boolValue)
+	var val boolValue
 	val.value = b
 	return val
 }
