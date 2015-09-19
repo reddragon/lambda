@@ -1,10 +1,20 @@
 package lang
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
-func saneQueryTest(query, expected string, t *testing.T, env *LangEnv) {
+func saneQueryTest(query string, t *testing.T, env *LangEnv) {
+	val := Eval(query, env)
+	if val.Val == nil || val.Err != nil {
+		t.Errorf("Expected %s to not be nil. Err: %s", query, val.Err)
+	}
+}
+
+func checkExprResultTest(query, expected string, t *testing.T, env *LangEnv) {
 	val := Eval(query, env)
 	if val.Val == nil || val.Err != nil {
 		t.Errorf("Expected %s to not be nil. Err: %s", query, val.Err)
@@ -24,49 +34,72 @@ func malformedQueryTest(query string, t *testing.T, env *LangEnv) {
 	}
 }
 
+// Generates an s-expression out of the basic {+, -, *, /} operators.
+func genSimpleOperatorsExpr(terminationProb float32, r *rand.Rand, depth int) string {
+	p := r.Float32()
+	// fmt.Printf("Got %f, terminationProb was %f, depth: %d\n", p, terminationProb, depth)
+	if p < terminationProb || depth > 1000 {
+		return fmt.Sprintf("%f", r.Float32())
+	}
+	operands := []string{"+", "-", "*", "/"}
+	return fmt.Sprintf("(%s %s %s)", operands[r.Intn(len(operands))], genSimpleOperatorsExpr(terminationProb, r, depth + 1), genSimpleOperatorsExpr(terminationProb, r, depth + 1))
+}
+
+// This will run a lot of random smoke tests with simple operators.
+func runRandomSmokeTests(t *testing.T, env *LangEnv) {
+	seed := time.Now().Unix()
+	// fmt.Printf("Using the seed %d. Use it to reproduce test failures.\n", seed)
+	r := rand.New(rand.NewSource(seed))
+	for i := 0; i < 100; i++ {
+		expr := genSimpleOperatorsExpr(0.5, r, 0)
+		// fmt.Printf("Generated Test: %s\n", expr)
+		saneQueryTest(expr, t, env)
+	}
+}
+
 func TestBasicLang(t *testing.T) {
 	env := new(LangEnv)
 	env.Init()
 
-	saneQueryTest("(+ 1 2)", "3", t, env)
-	saneQueryTest("(+ 1 2 3 4 5)", "15", t, env)
-	saneQueryTest("(+ \"Hello\" \",\" \"World!\")", "\"Hello,World!\"", t, env)
-	saneQueryTest("(- 1 2)", "-1", t, env)
-	saneQueryTest("(* 1 2)", "2", t, env)
-	saneQueryTest("(* 1 2 3 4 5)", "120", t, env)
-	saneQueryTest("(/ 1 2)", "0", t, env)
+	checkExprResultTest("(+ 1 2)", "3", t, env)
+	checkExprResultTest("(+ 1 2 3 4 5)", "15", t, env)
+	checkExprResultTest("(+ \"Hello\" \",\" \"World!\")", "\"Hello,World!\"", t, env)
+	checkExprResultTest("(- 1 2)", "-1", t, env)
+	checkExprResultTest("(* 1 2)", "2", t, env)
+	checkExprResultTest("(* 1 2 3 4 5)", "120", t, env)
+	checkExprResultTest("(/ 1 2)", "0", t, env)
 
-	saneQueryTest("(+ 1.1 2.1)", "3.2", t, env)
-	saneQueryTest("(- 1.3 2.1)", "-0.8", t, env)
-	saneQueryTest("(* 1.3 2)", "2.6", t, env)
-	saneQueryTest("(/ 1.3 2)", "0.65", t, env)
+	checkExprResultTest("(+ 1.1 2.1)", "3.2", t, env)
+	checkExprResultTest("(- 1.3 2.1)", "-0.8", t, env)
+	checkExprResultTest("(* 1.3 2)", "2.6", t, env)
+	checkExprResultTest("(/ 1.3 2)", "0.65", t, env)
 
-	saneQueryTest("(- 1 (/ 0.5509 0.5698))", "0.033169533169533194", t, env)
-	saneQueryTest("(- 1 (/ 6 3))", "-1", t, env)
+	checkExprResultTest("(- 1 (/ 0.5509 0.5698))", "0.033169533169533194", t, env)
+	checkExprResultTest("(- 1 (/ 6 3))", "-1", t, env)
 
-	saneQueryTest("(defvar x 2.0)", "2", t, env)
-	saneQueryTest("(+ x 2.0)", "4", t, env)
-	saneQueryTest("(defvar y 1.9)", "1.9", t, env)
-	saneQueryTest("(* x y)", "3.8", t, env)
-	saneQueryTest("(defvar i 5.0)", "5", t, env)
-	saneQueryTest("(defvar i 6.0)", "6", t, env)
+	checkExprResultTest("(defvar x 2.0)", "2", t, env)
+	checkExprResultTest("(+ x 2.0)", "4", t, env)
+	checkExprResultTest("(defvar y 1.9)", "1.9", t, env)
+	checkExprResultTest("(* x y)", "3.8", t, env)
+	checkExprResultTest("(defvar i 5.0)", "5", t, env)
+	checkExprResultTest("(defvar i 6.0)", "6", t, env)
 	malformedQueryTest("(+ i j)", t, env)
-	saneQueryTest("(defvar j 3.1)", "3.1", t, env)
-	saneQueryTest("(+ i j)", "9.1", t, env)
+	checkExprResultTest("(defvar j 3.1)", "3.1", t, env)
+	checkExprResultTest("(+ i j)", "9.1", t, env)
 
-	saneQueryTest("(> 3 2)", "true", t, env)
-	saneQueryTest("(> 2 3)", "false", t, env)
-	saneQueryTest("(< 3 2)", "false", t, env)
-	saneQueryTest("(< 2 3)", "true", t, env)
-	saneQueryTest("(>= 3 2)", "true", t, env)
-	saneQueryTest("(>= 3 3)", "true", t, env)
-	saneQueryTest("(<= 3 3)", "true", t, env)
-	saneQueryTest("(<= 3 2)", "false", t, env)
+	checkExprResultTest("(> 3 2)", "true", t, env)
+	checkExprResultTest("(> 2 3)", "false", t, env)
+	checkExprResultTest("(< 3 2)", "false", t, env)
+	checkExprResultTest("(< 2 3)", "true", t, env)
+	checkExprResultTest("(>= 3 2)", "true", t, env)
+	checkExprResultTest("(>= 3 3)", "true", t, env)
+	checkExprResultTest("(<= 3 3)", "true", t, env)
+	checkExprResultTest("(<= 3 2)", "false", t, env)
 
-	saneQueryTest("(> \"a\" \"b\")", "false", t, env)
-	saneQueryTest("(> \"b\" \"a\")", "true", t, env)
-	saneQueryTest("(< \"a\" \"b\")", "true", t, env)
-	saneQueryTest("(< \"b\" \"a\")", "false", t, env)
+	checkExprResultTest("(> \"a\" \"b\")", "false", t, env)
+	checkExprResultTest("(> \"b\" \"a\")", "true", t, env)
+	checkExprResultTest("(< \"a\" \"b\")", "true", t, env)
+	checkExprResultTest("(< \"b\" \"a\")", "false", t, env)
 
 	malformedQueryTest(")(", t, env)
 	malformedQueryTest(")", t, env)
@@ -74,4 +107,6 @@ func TestBasicLang(t *testing.T) {
 	malformedQueryTest("]]]", t, env)
 
 	malformedQueryTest("(/ 1 0)", t, env)
+
+	runRandomSmokeTests(t, env)
 }
