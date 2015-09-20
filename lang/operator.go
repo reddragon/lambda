@@ -12,6 +12,7 @@ type Operator struct {
 	minArgCount      int
 	maxArgCount      int
 	doNotResolveVars bool
+	passRawAST			 bool
 	handler          (func(*LangEnv, []Atom) Atom)
 }
 
@@ -29,6 +30,7 @@ const (
 	leq string = "<="
 	and string = "and"
 	or  string = "or"
+	defun string = "defun"
 )
 
 func addOperator(opMap map[string]*Operator, op *Operator) {
@@ -482,6 +484,90 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					retVal.Val = newBoolValue(val1.value <= val2.value)
 					break
 				}
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:      defun,
+			minArgCount: 3,
+			maxArgCount: 3,
+			passRawAST: true,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				fmt.Printf("Processing the method, length of operands: %d\n", len(operands))
+				astVal, ok := operands[0].Val.(astValue)
+				if !ok {
+					retVal.Err = errors.New(fmt.Sprintf("operand[0] has to be astValue"))
+					return retVal
+				}
+				fmt.Printf("Length of astNodes: %d\n", len(astVal.astNodes))
+				// Check astNode[0] is of varType, and is not registered in varMap
+				if !astVal.astNodes[0].isValue {
+					retVal.Err = errors.New(fmt.Sprintf("Method name not defined correctly."))
+					return retVal
+				}
+				methodNameVal, err := getValue(env, astVal.astNodes[0].value)
+				if err != nil || methodNameVal.getValueType() != varType {
+					retVal.Err = errors.New(fmt.Sprintf("Expecting method name, got %s\n", astVal.astNodes[0].value))
+					return retVal
+				}
+
+				methodName := methodNameVal.Str()
+				if _, ok := env.varMap[methodNameVal.Str()]; ok {
+					retVal.Err = errors.New(fmt.Sprintf("Method %s already defined as a variable\n", methodName))
+					return retVal
+				}
+
+				if _, ok := env.opMap[methodNameVal.Str()]; ok {
+					retVal.Err = errors.New(fmt.Sprintf("Method %s already defined as an operator\n", methodName))
+					return retVal
+				}
+
+				if astVal.astNodes[1].isValue {
+					retVal.Err = errors.New(fmt.Sprintf("Missing list of parameters for method %s\n", methodName))
+					return retVal
+				}
+
+				// Check astNode[1] is a list of varTypes.
+				params := make([]string, 0)
+				for i, node := range astVal.astNodes[1].children {
+					if !node.isValue {
+						retVal.Err = errors.New(fmt.Sprintf("Malformed parameter %d in method %s.", i, methodName))
+						return retVal
+					}
+					paramName := node.value
+					val, err := getValue(env, paramName)
+					if err != nil || val.getValueType() != varType {
+						retVal.Err = errors.New(fmt.Sprintf("Malformed parameter %s in method %s.", paramName, methodName))
+						return retVal
+					}
+					params = append(params, paramName)
+				}
+
+				addOperator(opMap,
+					&Operator{
+						symbol: methodName,
+						minArgCount: len(params),
+						maxArgCount: len(params),
+						handler: func (env *LangEnv, operands []Atom) Atom {
+							var retVal Atom
+							fmt.Printf("In the method %s\n", methodName)
+							newEnv := NewEnv()
+							newEnv.opMap = env.opMap
+							for i, p := range params {
+								newEnv.varMap[p] = operands[i].Val
+								fmt.Printf("Setting value of %s to %s\n", p, operands[i].Val.Str())
+							}
+
+							fmt.Printf("Evaluating the AST.\n")
+							retVal = evalAST(newEnv, astVal.astNodes[2])
+							return retVal
+						},
+					},
+				)
 				return retVal
 			},
 		},

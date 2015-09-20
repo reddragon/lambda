@@ -17,6 +17,7 @@ const (
 	floatType  = "floatType"
 	varType    = "varType"
 	boolType   = "boolType"
+	astType    = "astType"
 )
 
 type Value interface {
@@ -262,4 +263,40 @@ func newBoolValue(b bool) Value {
 	var val boolValue
 	val.value = b
 	return val
+}
+
+type astValue struct {
+	astNodes []*ASTNode
+}
+
+func (v astValue) getValueType() valueType {
+	return astType
+}
+
+func (v astValue) to(targetType valueType) (Value, error) {
+	return nil, typeConvError(v.getValueType(), targetType)
+}
+
+func (v astValue) ofType(targetValue string) bool {
+	return false
+}
+
+func (v astValue) Str() string {
+	return ""
+}
+
+func (v astValue) newValue(str string) Value {
+	return nil
+}
+
+func newASTValue(astNodes []*ASTNode) Value {
+	var val astValue
+	val.astNodes = astNodes
+	return val
+}
+
+type method struct {
+	methodName string
+	params []string
+	ast *ASTNode
 }

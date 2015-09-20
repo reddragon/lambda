@@ -78,18 +78,24 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 	}
 
 	operands := make([]Atom, 0)
-	for i := 1; i < len(node.children); i++ {
-		v := evalAST(env, node.children[i])
-		if v.Err != nil {
-			return v
-		}
-		if !operator.doNotResolveVars && v.Val.getValueType() == varType {
-			v.Val, v.Err = getVarValue(env, v.Val)
+	if operator.passRawAST {
+		var o Atom
+		o.Val = newASTValue(node.children[1:])
+		operands = append(operands, o)
+	} else {
+		for i := 1; i < len(node.children); i++ {
+			v := evalAST(env, node.children[i])
 			if v.Err != nil {
 				return v
 			}
+			if !operator.doNotResolveVars && v.Val.getValueType() == varType {
+				v.Val, v.Err = getVarValue(env, v.Val)
+				if v.Err != nil {
+					return v
+				}
+			}
+			operands = append(operands, v)
 		}
-		operands = append(operands, v)
 	}
 	v := operator.handler(env, operands)
 	if v.Err != nil {
