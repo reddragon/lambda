@@ -6,7 +6,7 @@ This is a WIP!
 A Lisp dialect written in Golang, which will hopefully 'eclipse' other Lisp dialects :) 
 
 I have been amazed at the kind of things that we can achieve with simple s-expressions. This is my attempt at writing yet
-another Lisp dialect. Right now what we have is a simple REPL, which can work on simple operators like +, -, * and /. It can do floating-point math, variables, comparisons such as [`eq`, `>`, `>=`, `<`, `<=`]. I will be adding methods and other goodness pretty soon.
+another Lisp dialect. Right now what we have is a simple REPL, which can work on simple operators like +, -, * and /. It can do floating-point math, variables, comparisons such as [`eq`, `>`, `>=`, `<`, `<=`]. I will be adding other goodness pretty soon.
 
 ### How to Use
 * `go get github.com/reddragon/eclisp`
@@ -36,6 +36,12 @@ eclisp> (* pi (* r r))
 
 eclisp> (/ 1 0)
 Error: Divide by zero
+
+eclisp> (defun addSq(x y) (+ (* x x) (* y y)))
+<Method: addSq>
+
+eclisp> (addSq 3 4)
+25
 
 eclisp> ^D
 Goodbye!
