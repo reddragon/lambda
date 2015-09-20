@@ -497,13 +497,11 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			passRawAST: true,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
-				fmt.Printf("Processing the method, length of operands: %d\n", len(operands))
 				astVal, ok := operands[0].Val.(astValue)
 				if !ok {
 					retVal.Err = errors.New(fmt.Sprintf("operand[0] has to be astValue"))
 					return retVal
 				}
-				fmt.Printf("Length of astNodes: %d\n", len(astVal.astNodes))
 				// Check astNode[0] is of varType, and is not registered in varMap
 				if !astVal.astNodes[0].isValue {
 					retVal.Err = errors.New(fmt.Sprintf("Method name not defined correctly."))
@@ -554,20 +552,20 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 						maxArgCount: len(params),
 						handler: func (env *LangEnv, operands []Atom) Atom {
 							var retVal Atom
-							fmt.Printf("In the method %s\n", methodName)
 							newEnv := NewEnv()
 							newEnv.opMap = env.opMap
 							for i, p := range params {
 								newEnv.varMap[p] = operands[i].Val
-								fmt.Printf("Setting value of %s to %s\n", p, operands[i].Val.Str())
 							}
 
-							fmt.Printf("Evaluating the AST.\n")
 							retVal = evalAST(newEnv, astVal.astNodes[2])
 							return retVal
 						},
 					},
 				)
+				val := new(varValue)
+				val.value = fmt.Sprintf("<Method: %s>", methodName)
+				retVal.Val = val
 				return retVal
 			},
 		},
