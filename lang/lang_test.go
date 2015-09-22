@@ -42,7 +42,7 @@ func genSimpleOperatorsExpr(terminationProb float32, r *rand.Rand, depth int) st
 		return fmt.Sprintf("%f", r.Float32())
 	}
 	operands := []string{"+", "-", "*", "/"}
-	return fmt.Sprintf("(%s %s %s)", operands[r.Intn(len(operands))], genSimpleOperatorsExpr(terminationProb, r, depth + 1), genSimpleOperatorsExpr(terminationProb, r, depth + 1))
+	return fmt.Sprintf("(%s %s %s)", operands[r.Intn(len(operands))], genSimpleOperatorsExpr(terminationProb, r, depth+1), genSimpleOperatorsExpr(terminationProb, r, depth+1))
 }
 
 // This will run a lot of random smoke tests with simple operators.

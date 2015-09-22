@@ -12,24 +12,24 @@ type Operator struct {
 	minArgCount      int
 	maxArgCount      int
 	doNotResolveVars bool
-	passRawAST			 bool
+	passRawAST       bool
 	handler          (func(*LangEnv, []Atom) Atom)
 }
 
 const (
 	// Operators
-	add string = "+"
-	sub string = "-"
-	mul string = "*"
-	div string = "/"
-	def string = "defvar"
-	eq  string = "eq"
-	gt  string = ">"
-	geq string = ">="
-	lt  string = "<"
-	leq string = "<="
-	and string = "and"
-	or  string = "or"
+	add   string = "+"
+	sub   string = "-"
+	mul   string = "*"
+	div   string = "/"
+	def   string = "defvar"
+	eq    string = "eq"
+	gt    string = ">"
+	geq   string = ">="
+	lt    string = "<"
+	leq   string = "<="
+	and   string = "and"
+	or    string = "or"
 	defun string = "defun"
 )
 
@@ -149,7 +149,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					val2, ok = operands[1].Val.(floatValue)
 					if !ok {
 						fmt.Printf("It was not ok!, type: %s, rawtype: %T\n",
-								operands[1].Val.getValueType(), operands[1].Val)
+							operands[1].Val.getValueType(), operands[1].Val)
 						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
 					}
 
@@ -494,7 +494,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			symbol:      defun,
 			minArgCount: 3,
 			maxArgCount: 3,
-			passRawAST: true,
+			passRawAST:  true,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				astVal, ok := operands[0].Val.(astValue)
@@ -547,10 +547,10 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 				addOperator(opMap,
 					&Operator{
-						symbol: methodName,
+						symbol:      methodName,
 						minArgCount: len(params),
 						maxArgCount: len(params),
-						handler: func (env *LangEnv, operands []Atom) Atom {
+						handler: func(env *LangEnv, operands []Atom) Atom {
 							var retVal Atom
 							maxRecursionLimit := 100000
 							newEnv := NewEnv()

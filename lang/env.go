@@ -3,9 +3,9 @@ package lang
 // Data required for interpretation of the language.
 // We start with the default environment, and build on top of it, over time.
 type LangEnv struct {
-	opMap  map[string]*Operator
-	types  []Value
-	varMap map[string]Value
+	opMap          map[string]*Operator
+	types          []Value
+	varMap         map[string]Value
 	recursionDepth int
 }
 

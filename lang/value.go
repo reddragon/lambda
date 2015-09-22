@@ -297,6 +297,6 @@ func newASTValue(astNodes []*ASTNode) Value {
 
 type method struct {
 	methodName string
-	params []string
-	ast *ASTNode
+	params     []string
+	ast        *ASTNode
 }
