@@ -6,6 +6,7 @@ type LangEnv struct {
 	opMap  map[string]*Operator
 	types  []Value
 	varMap map[string]Value
+	recursionDepth int
 }
 
 func NewEnv() *LangEnv {
@@ -20,6 +21,7 @@ func (e *LangEnv) Init() {
 	e.opMap = builtinOperators()
 	e.types = builtinTypes()
 	e.varMap = make(map[string]Value)
+	e.recursionDepth = 0
 }
 
 func (e *LangEnv) getOperator(sym string) *Operator {

@@ -552,10 +552,16 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 						maxArgCount: len(params),
 						handler: func (env *LangEnv, operands []Atom) Atom {
 							var retVal Atom
+							maxRecursionLimit := 100000
 							newEnv := NewEnv()
 							newEnv.opMap = env.opMap
 							for i, p := range params {
 								newEnv.varMap[p] = operands[i].Val
+							}
+							newEnv.recursionDepth = env.recursionDepth + 1
+							if newEnv.recursionDepth > maxRecursionLimit {
+								retVal.Err = errors.New(fmt.Sprintf("Reached the recursion limit of %d. Terminating.", maxRecursionLimit))
+								return retVal
 							}
 
 							retVal = evalAST(newEnv, astVal.astNodes[2])
