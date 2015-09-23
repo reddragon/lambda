@@ -46,7 +46,7 @@ eclisp> (addSq 3 4)
 eclisp> ^D
 Goodbye!
 ```
-eclisp can also read from files and execute them. Currently it only executes the first well-formed expression, but you can try it out with the `-f` option, like:
+eclisp can also read from files and execute them. You can try it out with the `-f` option, like:
 
 ```
 ./eclisp -f ~/path/to/my/script.el
