@@ -8,14 +8,14 @@ import (
 )
 
 func saneQueryTest(query string, t *testing.T, env *LangEnv) {
-	val := Eval(query, env)
+	val, _ := Eval(query, env)
 	if val.Val == nil || val.Err != nil {
 		t.Errorf("Expected %s to not be nil. Err: %s", query, val.Err)
 	}
 }
 
 func checkExprResultTest(query, expected string, t *testing.T, env *LangEnv) {
-	val := Eval(query, env)
+	val, _ := Eval(query, env)
 	if val.Val == nil || val.Err != nil {
 		t.Errorf("Expected %s to not be nil. Err: %s", query, val.Err)
 	} else {
@@ -26,7 +26,7 @@ func checkExprResultTest(query, expected string, t *testing.T, env *LangEnv) {
 }
 
 func malformedQueryTest(query string, t *testing.T, env *LangEnv) {
-	val := Eval(query, env)
+	val, _ := Eval(query, env)
 	if val.Val != nil {
 		t.Errorf("Expected value of %s to be nil, was %s", val.Val.Str())
 	} else if val.Err == nil {
