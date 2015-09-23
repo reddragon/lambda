@@ -11,12 +11,12 @@ type Atom struct {
 	Val Value
 }
 
-func Eval(exp string, env *LangEnv) *Atom {
-	astNode, _, err := getAST(exp)
+func Eval(exp string, env *LangEnv) (*Atom, []string) {
+	astNode, tokens, err := getAST(exp)
 	if err != nil {
 		retVal := new(Atom)
 		retVal.Err = err
-		return retVal
+		return retVal, nil
 	}
 
 	// This round-about way is not necessary. Gomobile trips if you return
@@ -27,7 +27,7 @@ func Eval(exp string, env *LangEnv) *Atom {
 	result := evalAST(env, astNode)
 	retVal.Val = result.Val
 	retVal.Err = result.Err
-	return retVal
+	return retVal, tokens
 }
 
 func evalAST(env *LangEnv, node *ASTNode) Atom {

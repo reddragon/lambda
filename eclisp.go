@@ -11,7 +11,7 @@ import (
 )
 
 func process(env *l.LangEnv, line string) {
-	retVal := l.Eval(line, env)
+	retVal, tokens := l.Eval(line, env)
 	if retVal.Err != nil {
 		fmt.Printf("Error: %s\n", retVal.Err)
 	} else {
@@ -19,6 +19,15 @@ func process(env *l.LangEnv, line string) {
 			fmt.Printf("%s\n", retVal.Val.Str())
 		} else {
 			fmt.Printf("\n")
+		}
+
+		if tokens != nil && len(tokens) > 0 {
+			var buffer bytes.Buffer
+			for _, s := range tokens {
+				buffer.WriteString(s)
+				buffer.WriteString(" ")
+			}
+			process(env, buffer.String())
 		}
 	}
 }
