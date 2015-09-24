@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func saneQueryTest(query string, t *testing.T, env *LangEnv) {
+func saneExprTest(query string, t *testing.T, env *LangEnv) {
 	val, _ := Eval(query, env)
 	if val.Val == nil || val.Err != nil {
 		t.Errorf("Expected %s to not be nil. Err: %s", query, val.Err)
@@ -25,7 +25,7 @@ func checkExprResultTest(query, expected string, t *testing.T, env *LangEnv) {
 	}
 }
 
-func malformedQueryTest(query string, t *testing.T, env *LangEnv) {
+func malformedExprTest(query string, t *testing.T, env *LangEnv) {
 	val, _ := Eval(query, env)
 	if val.Val != nil {
 		t.Errorf("Expected value of %s to be nil, was %s", val.Val.Str())
@@ -52,8 +52,7 @@ func runRandomSmokeTests(t *testing.T, env *LangEnv) {
 	r := rand.New(rand.NewSource(seed))
 	for i := 0; i < 100; i++ {
 		expr := genSimpleOperatorsExpr(0.5, r, 0)
-		// fmt.Printf("Generated Test: %s\n", expr)
-		saneQueryTest(expr, t, env)
+		saneExprTest(expr, t, env)
 	}
 }
 
@@ -83,7 +82,7 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(* x y)", "3.8", t, env)
 	checkExprResultTest("(defvar i 5.0)", "5", t, env)
 	checkExprResultTest("(defvar i 6.0)", "6", t, env)
-	malformedQueryTest("(+ i j)", t, env)
+	malformedExprTest("(+ i j)", t, env)
 	checkExprResultTest("(defvar j 3.1)", "3.1", t, env)
 	checkExprResultTest("(+ i j)", "9.1", t, env)
 
@@ -101,12 +100,24 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(< \"a\" \"b\")", "true", t, env)
 	checkExprResultTest("(< \"b\" \"a\")", "false", t, env)
 
-	malformedQueryTest(")(", t, env)
-	malformedQueryTest(")", t, env)
-	malformedQueryTest("(", t, env)
-	malformedQueryTest("]]]", t, env)
+	malformedExprTest(")(", t, env)
+	malformedExprTest(")", t, env)
+	malformedExprTest("(", t, env)
+	malformedExprTest("]]]", t, env)
 
-	malformedQueryTest("(/ 1 0)", t, env)
+	malformedExprTest("(/ 1 0)", t, env)
 
 	runRandomSmokeTests(t, env)
+}
+
+func TestMethods(t *testing.T) {
+	env := new(LangEnv)
+	env.Init()
+
+	saneExprTest("(defun foo (x) (+ 1 x))", t, env)
+	checkExprResultTest("(foo 4)", "5", t, env)
+	// TODO: This should fail
+	// See https://github.com/reddragon/eclisp/issues/10
+	// malformedExprTest("(foo)", t, env)
+	malformedExprTest("(foo 4 5)", t, env)
 }
