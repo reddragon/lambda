@@ -117,7 +117,7 @@ func TestMethods(t *testing.T) {
 	saneExprTest("(defun foo (x) (+ 1 x))", t, env)
 	checkExprResultTest("(foo 4)", "5", t, env)
 	// TODO: This should fail
-	// See https://github.com/reddragon/eclisp/issues/10
+	// See https://github.com/reddragon/lambda/issues/10
 	// malformedExprTest("(foo)", t, env)
 	malformedExprTest("(foo 4 5)", t, env)
 }

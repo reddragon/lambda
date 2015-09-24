@@ -54,7 +54,7 @@ func getValue(env *LangEnv, token string) (Value, error) {
 }
 
 /*
-Types in eclisp:
+Types in lambda:
 > 1 + 1
 2
 > 1 + 1.0

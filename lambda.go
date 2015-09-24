@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	l "github.com/reddragon/eclisp/lang"
+	l "github.com/reddragon/lambda/lang"
 	"github.com/tiborvass/uniline"
 	"os"
 )
@@ -36,7 +36,7 @@ func initREPL() {
 	// Setup the language environment
 	env := l.NewEnv()
 
-	prompt := "eclisp> "
+	prompt := "lambda> "
 	scanner := uniline.DefaultScanner()
 	for scanner.Scan(prompt) {
 		line := scanner.Text()
