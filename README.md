@@ -1,55 +1,55 @@
-# eclisp
-<img src="https://travis-ci.org/reddragon/eclisp.svg?branch=master"/>
+# lambda
+<img src="https://travis-ci.org/reddragon/lambda.svg?branch=master"/>
 
 This is a WIP!
 
-A Lisp dialect written in Golang, which will hopefully 'eclipse' other Lisp dialects :) 
+A Lisp dialect written in Golang, written purely for fun :-) 
 
 I have been amazed at the kind of things that we can achieve with simple s-expressions. This is my attempt at writing yet
 another Lisp dialect. Right now what we have is a simple REPL, which can work on simple operators like +, -, * and /. It can do floating-point math, variables, comparisons such as [`eq`, `>`, `>=`, `<`, `<=`]. I will be adding other goodness pretty soon.
 
 ### How to Use
-* `go get github.com/reddragon/eclisp`
-* `go build $GOPATH/src/github.com/reddragon/eclisp/eclisp.go`
-* `$GOPATH/bin/eclisp`
+* `go get github.com/reddragon/lambda`
+* `go build $GOPATH/src/github.com/reddragon/lambda/lambda.go`
+* `$GOPATH/bin/lambda`
 
 ### Sample Usage
 ```
-> ./eclisp
-eclisp> (+ 1 2)
+> ./lambda
+lambda> (+ 1 2)
 3
 
-eclisp> (- (/ (* (+ 1 2) 3) 3) 2)
+lambda> (- (/ (* (+ 1 2) 3) 3) 2)
 1
 
-eclisp> (/ 22 7.0)
+lambda> (/ 22 7.0)
 3.142857142857143
 
-eclisp> (defvar pi 3.14159265359)
+lambda> (defvar pi 3.14159265359)
 3.14159265359
 
-eclisp> (defvar r 10)
+lambda> (defvar r 10)
 10
 
-eclisp> (* pi (* r r))
+lambda> (* pi (* r r))
 314.159265359
 
-eclisp> (/ 1 0)
+lambda> (/ 1 0)
 Error: Divide by zero
 
-eclisp> (defun addSq(x y) (+ (* x x) (* y y)))
+lambda> (defun addSq(x y) (+ (* x x) (* y y)))
 <Method: addSq>
 
-eclisp> (addSq 3 4)
+lambda> (addSq 3 4)
 25
 
-eclisp> ^D
+lambda> ^D
 Goodbye!
 ```
-eclisp can also read from files and execute them. You can try it out with the `-f` option, like:
+lambda can also read from files and execute them. You can try it out with the `-f` option, like:
 
 ```
-./eclisp -f ~/path/to/my/script.el
+./lambda -f ~/path/to/my/script.l
 ```
 
 ### Inspiration
