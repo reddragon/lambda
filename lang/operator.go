@@ -40,6 +40,7 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 func addBuiltinOperators(opMap map[string]*Operator) {
 	numValPrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
 	strValPrecedenceMap := map[valueType]int{stringType: 1}
+	boolValPrecedenceMap := map[valueType]int{boolType: 1}
 
 	addOperator(opMap,
 		&Operator{
@@ -572,6 +573,56 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				val := new(varValue)
 				val.value = fmt.Sprintf("<Method: %s>", methodName)
 				retVal.Val = val
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:      and,
+			minArgCount: 2,
+			maxArgCount: 100,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				_, retVal.Err = typeCoerce(and, &operands, boolValPrecedenceMap)
+				if retVal.Err != nil {
+					return retVal
+				}
+
+				result := true
+				for _, o := range operands {
+					v, ok := o.Val.(boolValue)
+					if ok {
+						result = result && v.value
+					}
+				}
+				retVal.Val = newBoolValue(result)
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:      or,
+			minArgCount: 2,
+			maxArgCount: 100,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				_, retVal.Err = typeCoerce(or, &operands, boolValPrecedenceMap)
+				if retVal.Err != nil {
+					return retVal
+				}
+
+				result := false
+				for _, o := range operands {
+					v, ok := o.Val.(boolValue)
+					if ok {
+						result = result || v.value
+					}
+				}
+				retVal.Val = newBoolValue(result)
 				return retVal
 			},
 		},
