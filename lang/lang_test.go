@@ -100,6 +100,18 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(< \"a\" \"b\")", "true", t, env)
 	checkExprResultTest("(< \"b\" \"a\")", "false", t, env)
 
+	checkExprResultTest("(and true false)", "false", t, env)
+	checkExprResultTest("(and true true)", "true", t, env)
+	checkExprResultTest("(and false false)", "false", t, env)
+	checkExprResultTest("(and true true true true)", "true", t, env)
+	checkExprResultTest("(and true true true false)", "false", t, env)
+
+	checkExprResultTest("(or true false)", "true", t, env)
+	checkExprResultTest("(or true true)", "true", t, env)
+	checkExprResultTest("(or false false)", "false", t, env)
+	checkExprResultTest("(or true true true true)", "true", t, env)
+	checkExprResultTest("(or false false false true)", "true", t, env)
+
 	malformedExprTest(")(", t, env)
 	malformedExprTest(")", t, env)
 	malformedExprTest("(", t, env)
