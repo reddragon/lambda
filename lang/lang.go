@@ -80,7 +80,7 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 	operands := make([]Atom, 0)
 	if operator.passRawAST {
 		var o Atom
-		o.Val = newASTValue(node.children[1:])
+		o.Val = newASTValue(node)
 		operands = append(operands, o)
 	} else {
 		for i := 1; i < len(node.children); i++ {

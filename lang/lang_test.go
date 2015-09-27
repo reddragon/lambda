@@ -132,4 +132,9 @@ func TestMethods(t *testing.T) {
 	// See https://github.com/reddragon/lambda/issues/10
 	// malformedExprTest("(foo)", t, env)
 	malformedExprTest("(foo 4 5)", t, env)
+
+	saneExprTest("(defun fact (x) (cond (eq x 0) 1 (* x (fact (- x 1)))))", t, env)
+	checkExprResultTest("(fact 10)", "3628800", t, env)
+	saneExprTest("(defun fib (x) (cond (eq x 0) 0 (+ x (fib (- x 1)))))", t, env)
+	checkExprResultTest("(fib 10)", "55", t, env)
 }

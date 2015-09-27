@@ -31,6 +31,7 @@ const (
 	and   string = "and"
 	or    string = "or"
 	defun string = "defun"
+	cond  string = "cond"
 )
 
 func addOperator(opMap map[string]*Operator, op *Operator) {
@@ -556,9 +557,12 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							maxRecursionLimit := 100000
 							newEnv := NewEnv()
 							newEnv.opMap = env.opMap
+							// fmt.Printf("Executing the method %s with values: ", methodName)
 							for i, p := range params {
 								newEnv.varMap[p] = operands[i].Val
+								// fmt.Printf("%s = %s ", p, operands[i].Val.Str())
 							}
+							// fmt.Printf("\n")
 							newEnv.recursionDepth = env.recursionDepth + 1
 							if newEnv.recursionDepth > maxRecursionLimit {
 								retVal.Err = errors.New(fmt.Sprintf("Reached the recursion limit of %d. Terminating.", maxRecursionLimit))
@@ -623,6 +627,36 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					}
 				}
 				retVal.Val = newBoolValue(result)
+				return retVal
+			},
+		},
+	)
+
+	addOperator(opMap,
+		&Operator{
+			symbol:      cond,
+			minArgCount: 3,
+			maxArgCount: 3,
+			passRawAST: true,
+			handler: func(env *LangEnv, operands []Atom) Atom {
+				var retVal Atom
+				astNodeVal, _ := operands[0].Val.(astValue)
+				condValue := evalAST(env, astNodeVal.astNodes[0])
+				if condValue.Err != nil {
+					return condValue
+				}
+
+				if condValue.Val.getValueType() != boolType {
+					retVal.Err = errors.New(fmt.Sprintf("First argument to %s should be of type %s", cond, boolType))
+					return retVal
+				}
+
+				condBoolValue, _ := condValue.Val.(boolValue)
+				if condBoolValue.value {
+					return evalAST(env, astNodeVal.astNodes[1])
+				} else {
+					return evalAST(env, astNodeVal.astNodes[2])
+				}
 				return retVal
 			},
 		},
