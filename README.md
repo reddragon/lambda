@@ -43,6 +43,12 @@ lambda> (defun addSq(x y) (+ (* x x) (* y y)))
 lambda> (addSq 3 4)
 25
 
+lambda> (defun fact (x) (cond (eq x 0) 1 (* x (fact (- x 1)))))
+<Method: fact>
+
+lambda> (fact 10)
+3628800
+
 lambda> ^D
 Goodbye!
 ```
