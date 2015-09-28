@@ -23,7 +23,7 @@ const (
 	mul   string = "*"
 	div   string = "/"
 	def   string = "defvar"
-	eq    string = "eq"
+	eq    string = "="
 	gt    string = ">"
 	geq   string = ">="
 	lt    string = "<"
