@@ -1,12 +1,29 @@
 # lambda
 <img src="https://travis-ci.org/reddragon/lambda.svg?branch=master"/>
 
-This is a WIP!
+A WIP Lisp dialect written in Golang, written purely for fun :-) 
 
-A Lisp dialect written in Golang, written purely for fun :-) 
+### Introduction
 
-I have been amazed at the kind of things that we can achieve with simple s-expressions. This is my attempt at writing yet
-another Lisp dialect. Right now what we have is a simple REPL, which can work on simple operators like +, -, * and /. It can do floating-point math, variables, comparisons such as [`eq`, `>`, `>=`, `<`, `<=`]. I will be adding other goodness pretty soon.
+I have been amazed at the kind of things that we can achieve with simple s-expressions. s-expressions or symbolic exressions, are nothing but expressions of this format: `(operator operand1 operand2 ...)`, where we pass the operands to the operator for evaluation. For example, `(+ 1 2 3)` is the same as `1 + 2 + 3`. You can nest several such expressions like this. For example, `(* (+ 1 2) (+ 4 5))`, which is the same as `((1 + 2) * (4 + 5))`. In general, s-expressions make it easy for tree-structured code and data easy.
+
+Lisp, is a family of programming languages that have popularized the use of s-expressions. I found it interesting, and this is my attempt at writing yet another Lisp dialect. This is a purely academic pursuit, so don't use this in production. The crux of the work lies in the `lang` directory, but I have provided a simple REPL (Read-Eval-Print-Loop) to try out the language.
+
+#### What works so far
+* Integer, floating point and string types
+* Mathematical operators (`+`, `-`, `*`, `/`)
+* Comparison operators (`=`, `>`, `>=`, `<`, `<=`)
+* Logical operators (`or`, `and`)
+* Conditional (`cond`)
+* Defining variables (`defvar`)
+* Defining methods (`defun`) (Can't define multi-expressions methods yet)
+
+#### What's coming
+* Support for Lambdas
+* Multi-expression methods
+* Support for comments
+
+You can check the 'Sample Usage' section for a walk-through. I'll add more thorough documentation in the near future.
 
 ### How to Use
 * `go get github.com/reddragon/lambda`
@@ -43,7 +60,7 @@ lambda> (defun addSq(x y) (+ (* x x) (* y y)))
 lambda> (addSq 3 4)
 25
 
-lambda> (defun fact (x) (cond (eq x 0) 1 (* x (fact (- x 1)))))
+lambda> (defun fact (x) (cond (= x 0) 1 (* x (fact (- x 1)))))
 <Method: fact>
 
 lambda> (fact 10)
