@@ -1,8 +1,10 @@
 package lang
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // An Atom is either a value, or an error
@@ -11,23 +13,42 @@ type Atom struct {
 	Val Value
 }
 
-func Eval(exp string, env *LangEnv) (*Atom, []string) {
+type EvalResult struct {
+	ValStr string
+	ErrStr string
+	RemainingTokens string
+}
+
+func Eval(exp string, env *LangEnv) *EvalResult {
+	exp = strings.TrimSpace(exp)
+	evalResult := new(EvalResult)
 	astNode, tokens, err := getAST(exp)
 	if err != nil {
-		retVal := new(Atom)
-		retVal.Err = err
-		return retVal, nil
+		evalResult.ErrStr = err.Error()
+		return evalResult
 	}
 
 	// This round-about way is not necessary. Gomobile trips if you return
 	// structs by value.
 	// TODO
 	// Remove this hack, pending: https://github.com/golang/go/issues/11318
-	retVal := new(Atom)
 	result := evalAST(env, astNode)
-	retVal.Val = result.Val
-	retVal.Err = result.Err
-	return retVal, tokens
+	if result.Val != nil {
+		evalResult.ValStr = result.Val.Str()
+	}
+	if result.Err != nil {
+		evalResult.ErrStr = result.Err.Error()
+	}
+
+	if tokens != nil && len(tokens) > 0 {
+		var buffer bytes.Buffer
+		for _, s := range tokens {
+			buffer.WriteString(s)
+			buffer.WriteString(" ")
+		}
+		evalResult.RemainingTokens = strings.TrimSpace(buffer.String())
+	}
+	return evalResult
 }
 
 func evalAST(env *LangEnv, node *ASTNode) Atom {

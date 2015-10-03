@@ -11,23 +11,19 @@ import (
 )
 
 func process(env *l.LangEnv, line string) {
-	retVal, tokens := l.Eval(line, env)
-	if retVal.Err != nil {
-		fmt.Printf("Error: %s\n", retVal.Err)
+	evalResult := l.Eval(line, env)
+	tokens := evalResult.RemainingTokens
+	if len(evalResult.ErrStr) > 0 {
+		fmt.Printf("Error: %s\n", evalResult.ErrStr)
 	} else {
-		if retVal.Val != nil {
-			fmt.Printf("%s\n", retVal.Val.Str())
+		if len(evalResult.ValStr) > 0 {
+			fmt.Printf("%s\n", evalResult.ValStr)
 		} else {
 			fmt.Printf("\n")
 		}
 
-		if tokens != nil && len(tokens) > 0 {
-			var buffer bytes.Buffer
-			for _, s := range tokens {
-				buffer.WriteString(s)
-				buffer.WriteString(" ")
-			}
-			process(env, buffer.String())
+		if len(tokens) > 0 {
+			process(env, tokens)
 		}
 	}
 }
