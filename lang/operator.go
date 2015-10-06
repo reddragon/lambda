@@ -645,7 +645,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			symbol:      cond,
 			minArgCount: 3,
 			maxArgCount: 3,
-			passRawAST: true,
+			passRawAST:  true,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				astNodeVal, _ := operands[0].Val.(astValue)

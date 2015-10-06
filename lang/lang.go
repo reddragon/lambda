@@ -14,8 +14,8 @@ type Atom struct {
 }
 
 type EvalResult struct {
-	ValStr string
-	ErrStr string
+	ValStr          string
+	ErrStr          string
 	RemainingTokens string
 }
 

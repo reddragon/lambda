@@ -266,7 +266,7 @@ func newBoolValue(b bool) Value {
 }
 
 type astValue struct {
-	astNodes []*ASTNode
+	astNodes      []*ASTNode
 	parentASTNode *ASTNode
 }
 
