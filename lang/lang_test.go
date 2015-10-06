@@ -137,4 +137,12 @@ func TestMethods(t *testing.T) {
 	checkExprResultTest("(fact 10)", "3628800", t, env)
 	saneExprTest("(defun fib (x) (cond (= x 0) 0 (+ x (fib (- x 1)))))", t, env)
 	checkExprResultTest("(fib 10)", "55", t, env)
+
+	saneExprTest("(defvar varDefinedOutside 10)", t, env)
+	saneExprTest("(defun add (formalArg) (+ varDefinedOutside formalArg))", t, env)
+	checkExprResultTest("(add 11)", "21", t, env)
+
+	// Checking that we correctly override previously defined vars of same name
+	saneExprTest("(defvar formalArg -10)", t, env)
+	checkExprResultTest("(add 11)", "21", t, env)
 }

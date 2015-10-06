@@ -556,12 +556,20 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							var retVal Atom
 							maxRecursionLimit := 100000
 							newEnv := NewEnv()
+
+							// Copy all the operators of the parent env.
 							newEnv.opMap = env.opMap
+
+							// Copy all the variable values of the parent env.
+							// We will favor formal arguments over previously defined variables.
+							newEnv.varMap = env.varMap
+
 							// fmt.Printf("Executing the method %s with values: ", methodName)
 							for i, p := range params {
 								newEnv.varMap[p] = operands[i].Val
 								// fmt.Printf("%s = %s ", p, operands[i].Val.Str())
 							}
+
 							// fmt.Printf("\n")
 							newEnv.recursionDepth = env.recursionDepth + 1
 							if newEnv.recursionDepth > maxRecursionLimit {
