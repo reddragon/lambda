@@ -54,10 +54,10 @@ lambda> (* pi (* r r))
 lambda> (/ 1 0)
 Error: Divide by zero
 
-lambda> (defun addSq(x y) (+ (* x x) (* y y)))
-<Method: addSq>
+lambda> (defun add-sq(x y) (+ (* x x) (* y y)))
+<Method: add-sq>
 
-lambda> (addSq 3 4)
+lambda> (add-sq 3 4)
 25
 
 lambda> (defun fact (x) (cond (= x 0) 1 (* x (fact (- x 1)))))
