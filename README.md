@@ -60,7 +60,7 @@ lambda> (defun add-sq(x y) (+ (* x x) (* y y)))
 lambda> (add-sq 3 4)
 25
 
-lambda> (defun fact (x) (cond (= x 0) 1 (* x (fact (- x 1)))))
+lambda> (defun fact (x) (cond ((= x 0) 1) (true (* x (fact (- x 1))))))
 <Method: fact>
 
 lambda> (fact 10)
