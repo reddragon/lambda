@@ -112,12 +112,20 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(or true true true true)", "true", t, env)
 	checkExprResultTest("(or false false false true)", "true", t, env)
 
+	checkExprResultTest("(cond (true 1) (false 2))", "1", t, env)
+	checkExprResultTest("(cond (false 1) (true 2))", "2", t, env)
+	checkExprResultTest("(cond (false 1) (true 2) (false 3))", "2", t, env)
+	checkExprResultTest("(cond ((> 2 3) 1) ((= 3 3) 2))", "2", t, env)
+
 	malformedExprTest(")(", t, env)
 	malformedExprTest(")", t, env)
 	malformedExprTest("(", t, env)
 	malformedExprTest("]]]", t, env)
 
 	malformedExprTest("(/ 1 0)", t, env)
+
+	malformedExprTest("(cond (1 2))", t, env)
+	malformedExprTest("(cond (false 1) (false 2))", t, env)
 
 	runRandomSmokeTests(t, env)
 }
@@ -133,9 +141,9 @@ func TestMethods(t *testing.T) {
 	// malformedExprTest("(foo)", t, env)
 	malformedExprTest("(foo 4 5)", t, env)
 
-	saneExprTest("(defun fact (x) (cond (= x 0) 1 (* x (fact (- x 1)))))", t, env)
+	saneExprTest("(defun fact (x) (cond ((= x 0) 1) (true (* x (fact (- x 1))))))", t, env)
 	checkExprResultTest("(fact 10)", "3628800", t, env)
-	saneExprTest("(defun fib (x) (cond (= x 0) 0 (+ x (fib (- x 1)))))", t, env)
+	saneExprTest("(defun fib (x) (cond ((= x 0) 0) (true (+ x (fib (- x 1))))))", t, env)
 	checkExprResultTest("(fib 10)", "55", t, env)
 
 	saneExprTest("(defvar varDefinedOutside 10)", t, env)

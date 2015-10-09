@@ -643,27 +643,36 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 	addOperator(opMap,
 		&Operator{
 			symbol:      cond,
-			minArgCount: 3,
-			maxArgCount: 3,
+			minArgCount: 1,
+			maxArgCount: 100,
 			passRawAST:  true,
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				astNodeVal, _ := operands[0].Val.(astValue)
-				condValue := evalAST(env, astNodeVal.astNodes[0])
-				if condValue.Err != nil {
-					return condValue
-				}
+				for i, astNode := range astNodeVal.astNodes {
+					if len(astNode.children) != 2 {
+						retVal.Err = errors.New(fmt.Sprintf(
+							"Arguments for %s should be of the format `(condition value)`.",
+							cond))
+						return retVal
+					}
+					condValue := evalAST(env, astNode.children[0])
+					if condValue.Err != nil {
+						return condValue
+					}
+					if condValue.Val.getValueType() != boolType {
+						retVal.Err = errors.New(fmt.Sprintf(
+							"Arguments for operand %d for %s was of type %s instead of %s.",
+							i + 1, cond, condValue.Val.getValueType(), boolType))
+					}
+					condBoolValue, _ := condValue.Val.(boolValue)
+					if condBoolValue.value {
+						return evalAST(env, astNode.children[1])
+					}
 
-				if condValue.Val.getValueType() != boolType {
-					retVal.Err = errors.New(fmt.Sprintf("First argument to %s should be of type %s", cond, boolType))
-					return retVal
-				}
-
-				condBoolValue, _ := condValue.Val.(boolValue)
-				if condBoolValue.value {
-					return evalAST(env, astNodeVal.astNodes[1])
-				} else {
-					return evalAST(env, astNodeVal.astNodes[2])
+					retVal.Err = errors.New(fmt.Sprintf(
+						"None of the arguments for %s evaluated to true.",
+						cond))
 				}
 				return retVal
 			},
