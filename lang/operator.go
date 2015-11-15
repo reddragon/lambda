@@ -511,23 +511,23 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 				}
 				methodNameVal, err := getValue(env, astVal.astNodes[0].value)
 				if err != nil || methodNameVal.getValueType() != varType {
-					retVal.Err = errors.New(fmt.Sprintf("Expecting method name, got %s\n", astVal.astNodes[0].value))
+					retVal.Err = errors.New(fmt.Sprintf("Expecting method name, got %s", astVal.astNodes[0].value))
 					return retVal
 				}
 
 				methodName := methodNameVal.Str()
 				if _, ok := env.varMap[methodNameVal.Str()]; ok {
-					retVal.Err = errors.New(fmt.Sprintf("Method %s already defined as a variable\n", methodName))
+					retVal.Err = errors.New(fmt.Sprintf("Method %s already defined as a variable", methodName))
 					return retVal
 				}
 
 				if _, ok := env.opMap[methodNameVal.Str()]; ok {
-					retVal.Err = errors.New(fmt.Sprintf("Method %s already defined as an operator\n", methodName))
+					retVal.Err = errors.New(fmt.Sprintf("Method %s already defined as an operator", methodName))
 					return retVal
 				}
 
 				if astVal.astNodes[1].isValue {
-					retVal.Err = errors.New(fmt.Sprintf("Missing list of parameters for method %s\n", methodName))
+					retVal.Err = errors.New(fmt.Sprintf("Missing list of parameters for method %s", methodName))
 					return retVal
 				}
 
