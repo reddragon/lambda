@@ -117,6 +117,7 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(cond (false 1) (true 2) (false 3))", "2", t, env)
 	checkExprResultTest("(cond ((> 2 3) 1) ((= 3 3) 2))", "2", t, env)
 
+	malformedExprTest("()", t, env)
 	malformedExprTest(")(", t, env)
 	malformedExprTest(")", t, env)
 	malformedExprTest("(", t, env)

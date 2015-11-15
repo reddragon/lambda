@@ -64,6 +64,10 @@ func evalAST(env *LangEnv, node *ASTNode) Atom {
 		}
 		return retVal
 	}
+	if len(node.children) == 0 {
+		retVal.Err = errors.New("Cannot evaluate an empty expression")
+		return retVal
+	}
 	if len(node.children) == 1 {
 		return evalAST(env, node.children[0])
 	}
