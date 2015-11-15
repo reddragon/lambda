@@ -558,11 +558,17 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							newEnv := NewEnv()
 
 							// Copy all the operators of the parent env.
-							newEnv.opMap = env.opMap
+							newEnv.opMap = make(map[string]*Operator, 0)
+							for k, v := range env.opMap {
+								newEnv.opMap[k] = v
+							}
 
 							// Copy all the variable values of the parent env.
 							// We will favor formal arguments over previously defined variables.
-							newEnv.varMap = env.varMap
+							newEnv.varMap = make(map[string]Value, 0);
+							for k, v := range env.varMap {
+								newEnv.varMap[k] = v
+							}
 
 							// fmt.Printf("Executing the method %s with values: ", methodName)
 							for i, p := range params {
@@ -570,7 +576,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 								// fmt.Printf("%s = %s ", p, operands[i].Val.Str())
 							}
 
-							// fmt.Printf("\n")
+							// fmt.Printf(", d: %d\n", env.recursionDepth)
 							newEnv.recursionDepth = env.recursionDepth + 1
 							if newEnv.recursionDepth > maxRecursionLimit {
 								retVal.Err = errors.New(fmt.Sprintf("Reached the recursion limit of %d. Terminating.", maxRecursionLimit))

@@ -153,4 +153,10 @@ func TestMethods(t *testing.T) {
 	// Checking that we correctly override previously defined vars of same name
 	saneExprTest("(defvar formalArg -10)", t, env)
 	checkExprResultTest("(add 11)", "21", t, env)
+
+	// Check the magic number method.
+	saneExprTest("(defun magic (x) (cond ((<= x 0) 1) (true (+ (magic (- x 1)) (* 2 (magic (- x 3)))))))", t, env)
+	checkExprResultTest("(magic -10)", "1", t, env)
+	checkExprResultTest("(magic 0)", "1", t, env)
+	checkExprResultTest("(magic 10)", "309", t, env)
 }
