@@ -33,11 +33,15 @@ func Eval(exp string, env *LangEnv) *EvalResult {
 	// TODO
 	// Remove this hack, pending: https://github.com/golang/go/issues/11318
 	result := evalAST(env, astNode)
-	if result.Val != nil {
-		evalResult.ValStr = result.Val.Str()
+
+	if result.Val != nil && result.Val.getValueType() == varType {
+		result.Val, result.Err = getVarValue(env, result.Val)
 	}
+
 	if result.Err != nil {
 		evalResult.ErrStr = result.Err.Error()
+	} else if result.Val != nil {
+		evalResult.ValStr = result.Val.Str()
 	}
 
 	if tokens != nil && len(tokens) > 0 {

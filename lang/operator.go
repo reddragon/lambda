@@ -588,8 +588,9 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 						},
 					},
 				)
-				val := new(varValue)
+				var val varValue
 				val.value = fmt.Sprintf("<Method: %s>", methodName)
+				val.varName = methodName
 				retVal.Val = val
 				return retVal
 			},

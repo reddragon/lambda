@@ -60,6 +60,7 @@ func TestBasicLang(t *testing.T) {
 	env := new(LangEnv)
 	env.Init()
 
+	checkExprResultTest("1", "1", t, env)
 	checkExprResultTest("(+ 1 2)", "3", t, env)
 	checkExprResultTest("(+ 1 2 3 4 5)", "15", t, env)
 	checkExprResultTest("(+ \"Hello\" \",\" \"World!\")", "\"Hello,World!\"", t, env)
@@ -122,6 +123,7 @@ func TestBasicLang(t *testing.T) {
 	malformedExprTest(")", t, env)
 	malformedExprTest("(", t, env)
 	malformedExprTest("]]]", t, env)
+	malformedExprTest("zephyr", t, env)
 
 	malformedExprTest("(/ 1 0)", t, env)
 

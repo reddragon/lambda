@@ -28,13 +28,20 @@ type Value interface {
 	newValue(string) Value
 }
 
-func getVarValue(env *LangEnv, varValue Value) (Value, error) {
-	if varValue != nil && varValue.getValueType() == varType {
-		val := env.varMap[varValue.Str()]
+func getVarValue(env *LangEnv, varVal Value) (Value, error) {
+	if varVal != nil && varVal.getValueType() == varType {
+		varTypeVal, _ := varVal.(varValue)
+		varName := varTypeVal.varName
+
+		val := env.varMap[varName]
 		if val != nil {
 			return val, nil
 		}
-		return nil, errors.New(fmt.Sprintf("Undefined variable: %s", varValue.Str()))
+		opVal := env.opMap[varName]
+		if opVal != nil {
+			return varVal, nil
+		}
+		return nil, errors.New(fmt.Sprintf("Undefined variable: %s", varName))
 	}
 	return nil, errors.New(fmt.Sprintf("Error while resolving variable."))
 }
@@ -194,6 +201,7 @@ func (v floatValue) newValue(str string) Value {
 
 type varValue struct {
 	value string
+	varName string
 }
 
 func (v varValue) getValueType() valueType {
@@ -219,6 +227,7 @@ func (v varValue) Str() string {
 func (v varValue) newValue(str string) Value {
 	var val varValue
 	val.value = str
+	val.varName = str
 	return val
 }
 
