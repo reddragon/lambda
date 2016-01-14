@@ -29,26 +29,18 @@ func getAST(exp string) (*ASTNode, []string, error) {
 	if len(tokens) == 0 {
 		return nil, nil, errors.New("Nothing to evaluate")
 	}
-	return getASTOfTokens(tokens)
+	return buildAST(tokens)
 }
 
 func tokenize(exp string) []string {
-	tokens := strings.Split(
+	return strings.Fields(
 		strings.Replace(strings.Replace(exp, "(", " ( ", -1), ")", " ) ", -1),
-		" ",
 	)
-	noWSTokens := make([]string, 0)
-	for _, token := range tokens {
-		if token != "" {
-			noWSTokens = append(noWSTokens, token)
-		}
-	}
-	return noWSTokens
 }
 
 // This method does the heavy-lifting of building an AST, once an expression
 // is tokenized.
-func getASTOfTokens(tokens []string) (*ASTNode, []string, error) {
+func buildAST(tokens []string) (*ASTNode, []string, error) {
 	var token = ""
 	tokensLen := len(tokens)
 	// If it is an empty list of tokens, the AST is a nil node
@@ -85,9 +77,9 @@ func getASTOfTokens(tokens []string) (*ASTNode, []string, error) {
 			// If this is not an open brace, this is a single value
 			if tokens[0] != openBracket {
 				token, tokens = pop(tokens)
-				childNode, _, err = getASTOfTokens([]string{token})
+				childNode, _, err = buildAST([]string{token})
 			} else {
-				childNode, tokens, err = getASTOfTokens(tokens)
+				childNode, tokens, err = buildAST(tokens)
 			}
 			if err != nil {
 				return nil, tokens, err
