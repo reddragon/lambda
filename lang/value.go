@@ -292,7 +292,7 @@ func (v astValue) ofType(targetValue string) bool {
 }
 
 func (v astValue) Str() string {
-	return ""
+	return getASTStr(v.parentASTNode)
 }
 
 func (v astValue) newValue(str string) Value {

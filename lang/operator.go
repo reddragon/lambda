@@ -573,7 +573,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							// fmt.Printf("Executing the method %s with values: ", methodName)
 							for i, p := range params {
 								newEnv.varMap[p] = operands[i].Val
-								// fmt.Printf("%s = %s ", p, operands[i].Val.Str())
+								// fmt.Printf("%s = %s \n", p, operands[i].Val.Str())
 							}
 
 							// fmt.Printf(", d: %d\n", env.recursionDepth)
@@ -583,7 +583,9 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 								return retVal
 							}
 
-							retVal = evalAST(newEnv, astVal.astNodes[2])
+							// fmt.Printf("AST structure: %s\n", getASTStr(astVal.astNodes[2]))
+							retVal = evalASTHelper(newEnv, astVal.astNodes[2])
+							// fmt.Printf("evalASTHelper returned with %s\n", retVal.Val.Str())
 							return retVal
 						},
 					},

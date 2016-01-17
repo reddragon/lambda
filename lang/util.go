@@ -95,3 +95,27 @@ func chainedTypeCoerce(operatorName string, operands *[]Atom, typePrecendenceMap
 	}
 	return "", err
 }
+
+func getASTStr(node *ASTNode) string {
+	if node != nil {
+		if node.isValue {
+			return node.value
+		}
+
+		if node.children != nil {
+			astStr := ""
+			for _, child := range(node.children) {
+				astStr = astStr + getASTStr(child) + " "
+			}
+			return astStr
+		}
+	}
+	return ""
+}
+
+func printVarMap(varMap map[string]Value) {
+	fmt.Println("varMap values: ")
+	for k, v := range varMap {
+		fmt.Printf("%s = %s\n", k, v.Str())
+	}
+}

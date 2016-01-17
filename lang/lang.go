@@ -32,7 +32,7 @@ func Eval(exp string, env *LangEnv) *EvalResult {
 	// structs by value.
 	// TODO
 	// Remove this hack, pending: https://github.com/golang/go/issues/11318
-	result := evalAST(env, astNode)
+	result := evalASTHelper(env, astNode)
 
 	if result.Val != nil && result.Val.getValueType() == varType {
 		result.Val, result.Err = getVarValue(env, result.Val)
@@ -55,7 +55,17 @@ func Eval(exp string, env *LangEnv) *EvalResult {
 	return evalResult
 }
 
+func evalASTHelper(env *LangEnv, node *ASTNode) Atom {
+	result := evalAST(env, node)
+
+	if result.Val != nil && result.Val.getValueType() == varType {
+		result.Val, result.Err = getVarValue(env, result.Val)
+	}
+	return result
+}
+
 func evalAST(env *LangEnv, node *ASTNode) Atom {
+	// printVarMap(env.varMap)
 	var retVal Atom
 	retVal.Err = nil
 
