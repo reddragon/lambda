@@ -165,4 +165,9 @@ func TestMethods(t *testing.T) {
 	checkExprResultTest("(magic -10)", "1", t, env)
 	checkExprResultTest("(magic 0)", "1", t, env)
 	checkExprResultTest("(magic 10)", "309", t, env)
+
+	// Check the ability to pass functions as params.
+	saneExprTest("(defun add-one (x) (+ x 1))", t, env)
+	saneExprTest("(defun twice (f x) (f (f x)))", t, env)
+	checkExprResultTest("(twice add-one 2)", "4", t, env)
 }

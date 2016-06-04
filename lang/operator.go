@@ -570,10 +570,16 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 								newEnv.varMap[k] = v
 							}
 
-							// fmt.Printf("Executing the method %s with values: ", methodName)
+							// fmt.Printf("Executing the method %s with values: \n", methodName)
 							for i, p := range params {
-								newEnv.varMap[p] = operands[i].Val
-								// fmt.Printf("%s = %s \n", p, operands[i].Val.Str())
+								// Check here whether operands[i] is a variable / operator.
+								if op, ok := opMap[operands[i].Val.Str()]; ok {
+									newEnv.opMap[p] = op;
+									// fmt.Printf("%s = %s (op)\n", p, operands[i].Val.Str())
+								} else {
+									newEnv.varMap[p] = operands[i].Val
+									// fmt.Printf("%s = %s (op)\n", p, operands[i].Val.Str())
+								}
 							}
 
 							// fmt.Printf(", d: %d\n", env.recursionDepth)
