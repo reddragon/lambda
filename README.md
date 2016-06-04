@@ -5,9 +5,9 @@ A WIP Lisp dialect written in Golang, written purely for fun :-)
 
 ### Introduction
 
-I have been amazed at the kind of things that we can achieve with simple s-expressions. s-expressions or symbolic exressions, are nothing but expressions of this format: `(operator operand1 operand2 ...)`, where we pass the operands to the operator for evaluation. For example, `(+ 1 2 3)` is the same as `1 + 2 + 3`. You can nest several such expressions like this. For example, `(* (+ 1 2) (+ 4 5))`, which is the same as `((1 + 2) * (4 + 5))`. In general, s-expressions make it easy for tree-structured code and data easy.
+I have been amazed at the kind of things that we can achieve with simple s-expressions. s-expressions or symbolic exressions, are nothing but expressions of this format: `(operator operand1 operand2 ...)`, where we pass the operands to the operator for evaluation. For example, `(+ 1 2 3)` is the same as `1 + 2 + 3`. You can nest several such expressions like this. For example, `(* (+ 1 2) (+ 4 5))`, which is the same as `((1 + 2) * (4 + 5))`. In general, s-expressions make it easy to write tree-structured / recursive code and data.
 
-Lisp, is a family of programming languages that have popularized the use of s-expressions. I found it interesting, and this is my attempt at writing yet another Lisp dialect. This is a purely academic pursuit, so don't use this in production. The crux of the work lies in the `lang` directory, but I have provided a simple REPL (Read-Eval-Print-Loop) to try out the language.
+Lisp, is a family of programming languages that have popularized the use of s-expressions. I found it interesting, and this is my attempt at writing yet another Lisp dialect. This is a purely academic pursuit, so I would not recommend using this in production. The crux of the work lies in the `lang` directory, but I have provided a simple REPL (Read-Eval-Print-Loop) to try out the language.
 
 #### What works so far
 * Integer, floating point and string types
