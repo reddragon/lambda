@@ -1,7 +1,7 @@
 # lambda
 <img src="https://travis-ci.org/reddragon/lambda.svg?branch=master"/>
 
-A WIP Lisp dialect written in Golang, written purely for fun :-) 
+A WIP Lisp dialect written in Golang, written purely for fun :-)
 
 ### Introduction
 
@@ -17,9 +17,10 @@ Lisp, is a family of programming languages that have popularized the use of s-ex
 * Conditional (`cond`)
 * Defining variables (`defvar`)
 * Defining methods (`defun`) (Can't define multi-expressions methods yet)
+* Methods as first-class citizens.
 
 #### What's coming
-* Support for Lambdas
+* Full Support for anonymous methods.
 * Multi-expression methods
 * Support for comments
 
