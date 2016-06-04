@@ -17,10 +17,10 @@ Lisp, is a family of programming languages that have popularized the use of s-ex
 * Conditional (`cond`)
 * Defining variables (`defvar`)
 * Defining methods (`defun`) (Can't define multi-expressions methods yet)
-* Methods as first-class citizens.
+* Methods as first-class citizens
 
 #### What's coming
-* Full Support for anonymous methods.
+* Full Support for anonymous methods
 * Multi-expression methods
 * Support for comments
 
@@ -66,6 +66,15 @@ lambda> (defun fact (x) (cond ((= x 0) 1) (true (* x (fact (- x 1))))))
 
 lambda> (fact 10)
 3628800
+
+lambda> (defun add-one (x) (+ x 1))
+<Method: add-one>
+
+lambda> (defun twice (f x) (f (f x)))
+<Method: twice>
+
+lambda> (twice add-one 2)
+4
 
 lambda> ^D
 Goodbye!
