@@ -171,3 +171,43 @@ func TestMethods(t *testing.T) {
 	saneExprTest("(defun twice (f x) (f (f x)))", t, env)
 	checkExprResultTest("(twice add-one 2)", "4", t, env)
 }
+
+func checkOfType(value string, expectedType Value, t *testing.T) {
+	if !expectedType.ofType(value) {
+		t.Errorf("Expected %s to be of type %s, but was not.", value,
+			expectedType.getValueType())
+	}
+}
+
+func checkNotOfType(value string, unexpectedType Value, t *testing.T) {
+	if unexpectedType.ofType(value) {
+		t.Errorf("Expected %s to NOT be of type %s, but was.", value,
+			unexpectedType.getValueType())
+	}
+}
+
+// Adding some simple type checks.
+func TestTypes(t *testing.T) {
+	checkOfType("'hello'", new(stringValue), t)
+	checkOfType("\"hello\"", new(stringValue), t)
+	checkNotOfType("123", new(stringValue), t)
+	checkNotOfType("1.23", new(stringValue), t)
+	checkNotOfType("true", new(stringValue), t)
+	checkNotOfType("false", new(stringValue), t)
+
+	checkOfType("123", new(intValue), t)
+	checkNotOfType("1.23", new(intValue), t)
+	checkNotOfType("foobar", new(intValue), t)
+	checkNotOfType("true", new(intValue), t)
+	checkNotOfType("false", new(intValue), t)
+
+	// 123 is a valid float value too. We just would prefer it to be an int.
+	checkOfType("123", new(floatValue), t)
+	checkOfType("1.23", new(floatValue), t)
+	checkNotOfType("true", new(floatValue), t)
+
+	checkOfType("true", new(boolValue), t)
+	checkOfType("false", new(boolValue), t)
+	checkNotOfType("123", new(boolValue), t)
+	checkNotOfType("1.23", new(boolValue), t)
+}
