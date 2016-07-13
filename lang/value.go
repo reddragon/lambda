@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"math/big"
 )
 
 // Different types of values supported
@@ -14,6 +15,7 @@ const (
 	// Value type
 	stringType = "stringType"
 	intType    = "intType"
+	bigIntType = "bigIntType"
 	floatType  = "floatType"
 	varType    = "varType"
 	boolType   = "boolType"
@@ -157,6 +159,57 @@ func (v intValue) newValue(str string) Value {
 	}
 	var val intValue
 	val.value = intVal
+	return val
+}
+
+type bigIntValue struct {
+	value *big.Int
+}
+
+func (v bigIntValue) getValueType() valueType {
+	return bigIntType
+}
+
+func (v bigIntValue) to(targetType valueType) (Value, error) {
+	switch  targetType {
+	case intType:
+		// Get the int64 representation, and
+		// try creating an big.Int out of it.
+		intRep := v.value.Int64()
+		if v.value.Cmp(new(big.Int).SetInt64(intRep)) == 0 {
+			var val intValue
+			val.value = intRep
+			return val, nil
+		}
+		// An alternate way would be to check if the bigInt is either smaller than
+		// the smallest value of int64, or larger than the largest value of int64.
+	}
+	return nil, typeConvError(v.getValueType(), targetType)
+}
+
+func (v bigIntValue) ofType(targetValue string) bool {
+	// Here we are creating an extra copy of the big int.
+	bigIntVal := new(big.Int)
+	var ok bool
+	bigIntVal, ok = bigIntVal.SetString(targetValue, 0)
+	return ok
+}
+
+func (v bigIntValue) Str() string {
+	return v.value.String()
+}
+
+func (v bigIntValue) newValue(str string) Value {
+	bigIntVal := new(big.Int)
+	var ok bool
+	bigIntVal, ok = bigIntVal.SetString(str, 0)
+	if !ok {
+		fmt.Printf("There was an error!\n")
+		return nil
+	}
+
+	var val bigIntValue
+	val.value = bigIntVal
 	return val
 }
 

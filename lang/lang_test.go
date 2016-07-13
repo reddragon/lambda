@@ -210,4 +210,35 @@ func TestTypes(t *testing.T) {
 	checkOfType("false", new(boolValue), t)
 	checkNotOfType("123", new(boolValue), t)
 	checkNotOfType("1.23", new(boolValue), t)
+
+	checkOfType("123", new(bigIntValue), t)
+	checkOfType("123456789012345789", new(bigIntValue), t)
+	checkNotOfType("1.23", new(bigIntValue), t)
+	checkNotOfType("foobar", new(bigIntValue), t)
+	checkNotOfType("deadbeef", new(bigIntValue), t)
+	checkNotOfType("true", new(bigIntValue), t)
+	checkNotOfType("false", new(bigIntValue), t)
+}
+
+func checkTypeInitUsingStrMatches(vType Value, targetStr string, t *testing.T) {
+	actualStr := vType.newValue(targetStr).Str()
+	if actualStr != targetStr {
+		t.Errorf("Expected %s to be correctly represented in type %s, but was %s.",
+			targetStr, vType.getValueType(), actualStr)
+	}
+}
+
+func TestValueInitializations(t *testing.T) {
+	// This test checks if the value we used to initialize certain types, is
+	// actually getting set.
+	// Basically, what we can check is,
+	// newType.newValue(targetStr).Str() == targetStr
+
+	var bv bigIntValue
+	checkTypeInitUsingStrMatches(bv, "1234567891234512345678912345123456789", t)
+	checkTypeInitUsingStrMatches(bv, "-1234567891234512345678912345123456789", t)
+
+	var iv intValue
+	checkTypeInitUsingStrMatches(iv, "12345678912345", t)
+	checkTypeInitUsingStrMatches(iv, "-12345678912345", t)
 }

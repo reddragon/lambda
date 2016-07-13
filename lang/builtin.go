@@ -13,6 +13,7 @@ func builtinTypes() []Value {
 	// should be first.
 	types = append(types, new(stringValue))
 	types = append(types, new(intValue))
+	types = append(types, new(bigIntValue))
 	types = append(types, new(floatValue))
 	types = append(types, new(boolValue))
 	types = append(types, new(varValue))
