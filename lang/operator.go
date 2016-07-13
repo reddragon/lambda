@@ -565,7 +565,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 							// Copy all the variable values of the parent env.
 							// We will favor formal arguments over previously defined variables.
-							newEnv.varMap = make(map[string]Value, 0);
+							newEnv.varMap = make(map[string]Value, 0)
 							for k, v := range env.varMap {
 								newEnv.varMap[k] = v
 							}
@@ -574,7 +574,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							for i, p := range params {
 								// Check here whether operands[i] is a variable / operator.
 								if op, ok := opMap[operands[i].Val.Str()]; ok {
-									newEnv.opMap[p] = op;
+									newEnv.opMap[p] = op
 									// fmt.Printf("%s = %s (op)\n", p, operands[i].Val.Str())
 								} else {
 									newEnv.varMap[p] = operands[i].Val
@@ -678,7 +678,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					if condValue.Val.getValueType() != boolType {
 						retVal.Err = errors.New(fmt.Sprintf(
 							"Arguments for operand %d for %s was of type %s instead of %s.",
-							i + 1, cond, condValue.Val.getValueType(), boolType))
+							i+1, cond, condValue.Val.getValueType(), boolType))
 					}
 					condBoolValue, _ := condValue.Val.(boolValue)
 					if condBoolValue.value {

@@ -3,9 +3,9 @@ package lang
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"regexp"
 	"strconv"
-	"math/big"
 )
 
 // Different types of values supported
@@ -171,7 +171,7 @@ func (v bigIntValue) getValueType() valueType {
 }
 
 func (v bigIntValue) to(targetType valueType) (Value, error) {
-	switch  targetType {
+	switch targetType {
 	case intType:
 		// Get the int64 representation, and
 		// try creating an big.Int out of it.
@@ -253,7 +253,7 @@ func (v floatValue) newValue(str string) Value {
 }
 
 type varValue struct {
-	value string
+	value   string
 	varName string
 }
 

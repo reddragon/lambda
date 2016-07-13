@@ -104,7 +104,7 @@ func getASTStr(node *ASTNode) string {
 
 		if node.children != nil {
 			astStr := ""
-			for _, child := range(node.children) {
+			for _, child := range node.children {
 				astStr = astStr + getASTStr(child) + " "
 			}
 			return astStr
