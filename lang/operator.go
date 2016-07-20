@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"strings"
 )
@@ -52,11 +53,13 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				var finalType valueType
+
 				finalType, retVal.Err = chainedTypeCoerce(add, &operands, []map[valueType]int{numValPrecedenceMap, strValPrecedenceMap})
 				if retVal.Err != nil {
 					return retVal
 				}
 
+			performOp:
 				switch finalType {
 				case intType:
 					var finalVal intValue
@@ -64,6 +67,19 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					for _, o := range operands {
 						v, ok := o.Val.(intValue)
 						if ok {
+							// Check for overflow/underflow here.
+							if (v.value > 0 && (finalVal.value > math.MaxInt64-v.value)) ||
+								(v.value <= 0 && finalVal.value < math.MinInt64-v.value) {
+								// There will be an overflow, so better cast to bigIntType here.
+								err := tryTypeCastTo(&operands, bigIntType)
+								if err != nil {
+									fmt.Printf("Problem while avoiding overflow in operand %s: %s.\n", add, err)
+								} else {
+									finalType = bigIntType
+									goto performOp
+								}
+							}
+
 							finalVal.value = finalVal.value + v.value
 						} else {
 							fmt.Errorf("Error while converting %s to intValue\n", o.Val.Str())

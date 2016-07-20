@@ -32,6 +32,21 @@ func pop(tokens []string) (string, []string) {
 	return tokens[0], tokens[1:]
 }
 
+// This method force casts all operands to the given value type.
+func tryTypeCastTo(operands *[]Atom, finalType valueType) error {
+	for i := 0; i < len(*operands); i++ {
+		if (*operands)[i].Val.getValueType() != finalType {
+			var err error
+			(*operands)[i].Val, err = (*operands)[i].Val.to(finalType)
+
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // Algorithm:
 // 1. We get the type -> count mapping.
 // 2. If there is only one type, there is nothing to do.
