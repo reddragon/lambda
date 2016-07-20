@@ -86,15 +86,9 @@ func typeCoerce(operatorName string, operands *[]Atom, typePrecendenceMap map[va
 		}
 	}
 
-	for i := 0; i < len(*operands); i++ {
-		if (*operands)[i].Val.getValueType() != finalType {
-			var err error
-			(*operands)[i].Val, err = (*operands)[i].Val.to(finalType)
-
-			if err != nil {
-				return "", err
-			}
-		}
+	err = tryTypeCastTo(operands, finalType)
+	if err != nil {
+		return "", err
 	}
 	return finalType, nil
 }

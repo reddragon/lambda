@@ -53,7 +53,6 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 			handler: func(env *LangEnv, operands []Atom) Atom {
 				var retVal Atom
 				var finalType valueType
-
 				finalType, retVal.Err = chainedTypeCoerce(add, &operands, []map[valueType]int{numValPrecedenceMap, strValPrecedenceMap})
 				if retVal.Err != nil {
 					return retVal
