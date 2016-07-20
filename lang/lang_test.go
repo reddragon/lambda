@@ -65,8 +65,6 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(+ 1 2 3 4 5)", "15", t, env)
 	checkExprResultTest("(+ 111111111111111111111111111111111111111111111111 1)",
 		"111111111111111111111111111111111111111111111112", t, env)
-	checkExprResultTest("(+ 9223372036854775807 1)", "9223372036854775808", t, env)
-	checkExprResultTest("(+ -9223372036854775808 -1)", "-9223372036854775809", t, env)
 	checkExprResultTest("(+ \"Hello\" \",\" \"World!\")", "\"Hello,World!\"", t, env)
 	checkExprResultTest("(- 1 2)", "-1", t, env)
 	checkExprResultTest("(* 1 2)", "2", t, env)
@@ -80,6 +78,12 @@ func TestBasicLang(t *testing.T) {
 
 	checkExprResultTest("(- 1 (/ 0.5509 0.5698))", "0.033169533169533194", t, env)
 	checkExprResultTest("(- 1 (/ 6 3))", "-1", t, env)
+
+	// The following checks are for overflows/underflows.
+	// MaxInt64 = 9223372036854775807
+	// MinInt64 = -9223372036854775808
+	checkExprResultTest("(+ 9223372036854775807 1)", "9223372036854775808", t, env)
+	checkExprResultTest("(+ -9223372036854775808 -1)", "-9223372036854775809", t, env)
 
 	checkExprResultTest("(defvar x 2.0)", "2", t, env)
 	checkExprResultTest("(+ x 2.0)", "4", t, env)
