@@ -131,6 +131,11 @@ func (v intValue) to(targetType valueType) (Value, error) {
 	switch targetType {
 	case intType:
 		return v, nil
+	case bigIntType:
+		var val bigIntValue
+		val.value = new(big.Int)
+		val.value.SetInt64(v.value)
+		return val, nil
 	case floatType:
 		var val floatValue
 		val.value = float64(v.value)

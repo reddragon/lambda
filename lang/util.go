@@ -42,8 +42,10 @@ func typeCoerce(operatorName string, operands *[]Atom, typePrecendenceMap map[va
 	var err error
 	var typesCountMap map[valueType]int
 	allowedTypes := make([]valueType, len(typePrecendenceMap))
+	typeIdx := 0
 	for vtype, _ := range typePrecendenceMap {
-		allowedTypes = append(allowedTypes, vtype)
+		allowedTypes[typeIdx] = vtype
+		typeIdx++
 	}
 
 	typesCountMap, err = checkArgTypes(operatorName, operands, allowedTypes)

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math/big"
 	"strings"
 )
 
@@ -39,7 +40,7 @@ func addOperator(opMap map[string]*Operator, op *Operator) {
 }
 
 func addBuiltinOperators(opMap map[string]*Operator) {
-	numValPrecedenceMap := map[valueType]int{intType: 1, floatType: 2}
+	numValPrecedenceMap := map[valueType]int{intType: 1, bigIntType: 2, floatType: 3}
 	strValPrecedenceMap := map[valueType]int{stringType: 1}
 	boolValPrecedenceMap := map[valueType]int{boolType: 1}
 
@@ -66,6 +67,20 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							finalVal.value = finalVal.value + v.value
 						} else {
 							fmt.Errorf("Error while converting %s to intValue\n", o.Val.Str())
+						}
+					}
+					retVal.Val = finalVal
+					break
+
+				case bigIntType:
+					var finalVal bigIntValue
+					finalVal.value = new(big.Int)
+					for _, o := range operands {
+						v, ok := o.Val.(bigIntValue)
+						if ok {
+							finalVal.value = finalVal.value.Add(finalVal.value, v.value)
+						} else {
+							fmt.Errorf("Error while converting %s to bigIntValue\n", o.Val.Str())
 						}
 					}
 					retVal.Val = finalVal
