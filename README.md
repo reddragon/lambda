@@ -64,8 +64,8 @@ lambda> (add-sq 3 4)
 lambda> (defun fact (x) (cond ((= x 0) 1) (true (* x (fact (- x 1))))))
 <Method: fact>
 
-lambda> (fact 10)
-3628800
+lambda> (fact 30)
+265252859812191058636308480000000
 
 lambda> (defun add-one (x) (+ x 1))
 <Method: add-one>
