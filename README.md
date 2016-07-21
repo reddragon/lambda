@@ -18,13 +18,14 @@ Lisp, is a family of programming languages that have popularized the use of s-ex
 * Defining variables (`defvar`)
 * Defining methods (`defun`) (Can't define multi-expressions methods yet)
 * Methods as first-class citizens
+* Support for Big Int calculations
 
-#### What's coming
+#### What might come*
 * Full Support for anonymous methods
 * Multi-expression methods
 * Support for comments
 
-You can check the 'Sample Usage' section for a walk-through. I'll add more thorough documentation in the near future.
+**Update**: I am going to to shift my attention to other projects as of July 2016. If you feel strongly about a particular feature, either feel free to implement it and send a pull request (I can help with giving pointers), or let me know and I will try to prioritize it.
 
 ### How to Use
 * `go get github.com/reddragon/lambda`
