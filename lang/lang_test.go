@@ -92,6 +92,8 @@ func TestBasicLang(t *testing.T) {
 	checkExprResultTest("(- -9223372036854775808 1)", "-9223372036854775809", t, env)
 	checkExprResultTest("(- 9223372036854775807 -1)", "9223372036854775808", t, env)
 	checkExprResultTest("(/ -9223372036854775808 -1)", "9223372036854775808", t, env)
+	checkExprResultTest("(* -9223372036854775808 -1)", "9223372036854775808", t, env)
+	checkExprResultTest("(* 9223372036854775807 2)", "18446744073709551614", t, env)
 
 	checkExprResultTest("(defvar x 2.0)", "2", t, env)
 	checkExprResultTest("(+ x 2.0)", "4", t, env)

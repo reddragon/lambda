@@ -239,14 +239,38 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					return retVal
 				}
 
+			performOp:
 				switch finalType {
 				case intType:
 					var finalVal intValue
 					finalVal.value = 1
+
+					bigIntOp1 := new(big.Int)
+					bigIntOp2 := new(big.Int)
 					for _, o := range operands {
 						v, ok := o.Val.(intValue)
 						if ok {
+							// Check for overflow/underflow here.
+							// The check for multiply turns out to be quite complex.
+							// Refer to this document for the suggested implementation:
+							// https://www.securecoding.cert.org/confluence/display/java/NUM00-J.+Detect+or+prevent+integer+overflow
+							// In order to preserve readability, I would just check if
+							// big.Int's Mul method returns the same value.
+							// This would obviously make multiplications a little slow.
+							bigIntOp1.SetInt64(finalVal.value)
+							bigIntOp2.SetInt64(v.value)
+							bigIntOp1.Mul(bigIntOp1, bigIntOp2)
+
 							finalVal.value = finalVal.value * v.value
+							if bigIntOp1.String() != finalVal.Str() {
+								err := tryTypeCastTo(&operands, bigIntType)
+								if err != nil {
+									fmt.Printf("Problem while avoiding overflow in operand %s: %s.\n", add, err)
+								} else {
+									finalType = bigIntType
+									goto performOp
+								}
+							}
 						} else {
 							fmt.Errorf("Error while converting %s to intValue\n", o.Val.Str())
 						}
