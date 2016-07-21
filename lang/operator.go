@@ -161,9 +161,28 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 					val2, ok = operands[1].Val.(intValue)
 					if !ok {
-						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
+						fmt.Errorf("Error while converting %s to intValue\n", operands[1].Val.Str())
 					}
 					finalVal.value = val1.value - val2.value
+					retVal.Val = finalVal
+					break
+
+				case bigIntType:
+					var finalVal bigIntValue
+					var val1, val2 bigIntValue
+					finalVal.value = new(big.Int)
+
+					var ok bool
+					val1, ok = operands[0].Val.(bigIntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to bigIntValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(bigIntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to bigIntValue\n", operands[1].Val.Str())
+					}
+					finalVal.value.Sub(val1.value, val2.value)
 					retVal.Val = finalVal
 					break
 
@@ -182,7 +201,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					if !ok {
 						fmt.Printf("It was not ok!, type: %s, rawtype: %T\n",
 							operands[1].Val.getValueType(), operands[1].Val)
-						fmt.Errorf("Error while converting %s to floatValue\n", operands[0].Val.Str())
+						fmt.Errorf("Error while converting %s to floatValue\n", operands[1].Val.Str())
 					}
 
 					finalVal.value = val1.value - val2.value
@@ -217,6 +236,21 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 							finalVal.value = finalVal.value * v.value
 						} else {
 							fmt.Errorf("Error while converting %s to intValue\n", o.Val.Str())
+						}
+					}
+					retVal.Val = finalVal
+					break
+
+				case bigIntType:
+					var finalVal bigIntValue
+					finalVal.value = new(big.Int)
+					finalVal.value.SetInt64(1)
+					for _, o := range operands {
+						v, ok := o.Val.(bigIntValue)
+						if ok {
+							finalVal.value = finalVal.value.Mul(finalVal.value, v.value)
+						} else {
+							fmt.Errorf("Error while converting %s to bigIntValue\n", o.Val.Str())
 						}
 					}
 					retVal.Val = finalVal
@@ -268,10 +302,34 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 
 					val2, ok = operands[1].Val.(intValue)
 					if !ok {
-						fmt.Errorf("Error while converting %s to intValue\n", operands[0].Val.Str())
+						fmt.Errorf("Error while converting %s to intValue\n", operands[1].Val.Str())
 					}
 					if val2.value != 0 {
 						finalVal.value = val1.value / val2.value
+						retVal.Val = finalVal
+					} else {
+						retVal.Err = errors.New(fmt.Sprintf("divide by zero"))
+					}
+					break
+
+				case bigIntType:
+					var finalVal bigIntValue
+					var val1, val2 bigIntValue
+					finalVal.value = new(big.Int)
+					finalVal.value.SetInt64(1)
+
+					var ok bool
+					val1, ok = operands[0].Val.(bigIntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to bigIntValue\n", operands[0].Val.Str())
+					}
+
+					val2, ok = operands[1].Val.(bigIntValue)
+					if !ok {
+						fmt.Errorf("Error while converting %s to bigIntValue\n", operands[1].Val.Str())
+					}
+					if val2.value.Cmp(new(big.Int).SetInt64(0)) != 0 {
+						finalVal.value.Div(val1.value, val2.value)
 						retVal.Val = finalVal
 					} else {
 						retVal.Err = errors.New(fmt.Sprintf("divide by zero"))

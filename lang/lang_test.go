@@ -67,9 +67,14 @@ func TestBasicLang(t *testing.T) {
 		"111111111111111111111111111111111111111111111112", t, env)
 	checkExprResultTest("(+ \"Hello\" \",\" \"World!\")", "\"Hello,World!\"", t, env)
 	checkExprResultTest("(- 1 2)", "-1", t, env)
+	checkExprResultTest("(- 111111111111111111111111111111111111111111111111 1)",
+		"111111111111111111111111111111111111111111111110", t, env)
 	checkExprResultTest("(* 1 2)", "2", t, env)
 	checkExprResultTest("(* 1 2 3 4 5)", "120", t, env)
+	checkExprResultTest("(* 111111111111111111111111111111111111111111111111 2)",
+		"222222222222222222222222222222222222222222222222", t, env)
 	checkExprResultTest("(/ 1 2)", "0", t, env)
+	checkExprResultTest("(/ 111111111111111111111111111111111111111111111111 1)", "111111111111111111111111111111111111111111111111", t, env)
 
 	checkExprResultTest("(+ 1.1 2.1)", "3.2", t, env)
 	checkExprResultTest("(- 1.3 2.1)", "-0.8", t, env)
