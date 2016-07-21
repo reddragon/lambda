@@ -301,6 +301,7 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 					return retVal
 				}
 
+			performOp:
 				switch finalType {
 				case intType:
 					var finalVal intValue
@@ -318,6 +319,17 @@ func addBuiltinOperators(opMap map[string]*Operator) {
 						fmt.Errorf("Error while converting %s to intValue\n", operands[1].Val.Str())
 					}
 					if val2.value != 0 {
+						// Check for overflow/underflow here.
+						if val1.value == math.MinInt64 && val2.value == -1 {
+							err := tryTypeCastTo(&operands, bigIntType)
+							if err != nil {
+								fmt.Printf("Problem while avoiding overflow in operand %s: %s.\n", add, err)
+							} else {
+								finalType = bigIntType
+								goto performOp
+							}
+						}
+
 						finalVal.value = val1.value / val2.value
 						retVal.Val = finalVal
 					} else {
