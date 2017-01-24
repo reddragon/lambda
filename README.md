@@ -1,7 +1,7 @@
 # lambda
 <img src="https://travis-ci.org/reddragon/lambda.svg?branch=master"/>
 
-A WIP Lisp dialect written in Golang, written purely for fun :-)
+A ~~WIP~~ Lisp dialect written in Golang, written purely for fun :-)
 
 ### Introduction
 
